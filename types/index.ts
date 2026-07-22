@@ -12,5 +12,5 @@ export interface AuthContextType {
     email: string,
     password: string,
   ) => Promise<{ error: string | null }>;
-  signOut: () => Promise<void>;
+  signOut: () => Promise<{ error: string | null }>;
 }

@@ -1,76 +1,88 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Redirect, Slot, Tabs } from "expo-router";
-import { ActivityIndicator, Platform, View } from "react-native";
+import { DrawerActions } from "@react-navigation/native";
+import { Drawer } from "expo-router/drawer";
+import { Platform, type ViewStyle } from "react-native";
 
-import { MobileHeader } from "@/components/MobileHeader";
-import { Sidebar } from "@/components/Sidebar";
-import { SidebarProvider, useSidebar } from "@/context/SidebarContext";
-import { useAuth } from "@/providers/AuthProvider";
+import { AppHeader } from "@/components/layout/AppHeader";
+import { AppDrawerContent } from "@/components/navigation/AppDrawerContent";
+import { getNavigationItem } from "@/constants/navigation";
+import { AppShellProvider, useAppShell } from "@/context/AppShellContext";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
-export const NAV_ITEMS = [
-  { name: "dashboard", label: "Dashboard", icon: "grid-outline" as const },
-  { name: "settings", label: "Settings", icon: "settings-outline" as const },
-];
+type WebTransitionStyle = ViewStyle & {
+  transitionDuration?: string;
+  transitionProperty?: string;
+  transitionTimingFunction?: string;
+};
 
-function WebProtectedLayout() {
-  const { breakpoint } = useSidebar();
+function ProtectedNavigator() {
+  const { colors } = useAppTheme();
+  const { drawerWidth, isDesktop, toggleDesktopSidebar } = useAppShell();
+  const webTransition: WebTransitionStyle | undefined =
+    Platform.OS === "web"
+      ? {
+          transitionDuration: "180ms",
+          transitionProperty: "width",
+          transitionTimingFunction: "ease-in-out",
+        }
+      : undefined;
 
   return (
-    <View className="flex-1 flex-row bg-gray-50">
-      <Sidebar />
-      <View className="flex-1">
-        {breakpoint === "mobile" && <MobileHeader />}
-        <View className="flex-1">
-          <Slot />
-        </View>
-      </View>
-    </View>
+    <Drawer
+      defaultStatus="closed"
+      drawerContent={(props) => <AppDrawerContent {...props} />}
+      screenOptions={({ route }) => {
+        const navigationItem = getNavigationItem(route.name);
+
+        return {
+          drawerType: isDesktop
+            ? "permanent"
+            : Platform.OS === "ios"
+              ? "slide"
+              : "front",
+          drawerStyle: [
+            {
+              width: drawerWidth,
+              overflow: "visible",
+              borderRightColor: colors.border,
+              borderRightWidth: 1,
+              backgroundColor: colors.surface,
+            },
+            webTransition,
+          ],
+          sceneStyle: { backgroundColor: colors.background },
+          overlayColor: colors.overlay,
+          swipeEnabled: !isDesktop,
+          swipeEdgeWidth: 72,
+          keyboardDismissMode: "on-drag",
+          freezeOnBlur: true,
+          headerShown: true,
+          header: ({ navigation }) => (
+            <AppHeader
+              title={navigationItem?.label ?? "Workspace"}
+              onMenuPress={() => {
+                if (isDesktop) {
+                  toggleDesktopSidebar();
+                } else {
+                  navigation.dispatch(DrawerActions.toggleDrawer());
+                }
+              }}
+            />
+          ),
+        };
+      }}
+    >
+      <Drawer.Screen name="dashboard" options={{ title: "Dashboard" }} />
+      <Drawer.Screen name="projects" options={{ title: "Projects" }} />
+      <Drawer.Screen name="teams" options={{ title: "Teams" }} />
+      <Drawer.Screen name="settings" options={{ title: "Settings" }} />
+    </Drawer>
   );
 }
 
 export default function ProtectedLayout() {
-  const { session, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#000" />
-      </View>
-    );
-  }
-
-  if (!session) {
-    return <Redirect href="/(auth)/login" />;
-  }
-
-  if (Platform.OS === "web") {
-    return (
-      <SidebarProvider>
-        <WebProtectedLayout />
-      </SidebarProvider>
-    );
-  }
-
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: "#000",
-        tabBarInactiveTintColor: "#9CA3AF",
-      }}
-    >
-      {NAV_ITEMS.map((item) => (
-        <Tabs.Screen
-          key={item.name}
-          name={item.name}
-          options={{
-            title: item.label,
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name={item.icon} color={color} size={size} />
-            ),
-          }}
-        />
-      ))}
-    </Tabs>
+    <AppShellProvider>
+      <ProtectedNavigator />
+    </AppShellProvider>
   );
 }
