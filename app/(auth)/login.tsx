@@ -2,12 +2,13 @@ import { Button } from "@/components/Button";
 import { Container } from "@/components/Container";
 import { Input } from "@/components/Input";
 import { useAuth } from "@/providers/AuthProvider";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, Text, View } from "react-native";
 
 export default function Login() {
   const { signIn } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,11 @@ export default function Login() {
     setLoading(true);
     const { error } = await signIn(email, password);
     setLoading(false);
-    if (error) Alert.alert("Login Failed", error);
+    if (error) {
+      Alert.alert("Login Failed", error);
+      return;
+    }
+    router.replace("/(protected)/dashboard");
   };
 
   return (
