@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { radii, spacing, type ThemeMode } from "@/constants/theme";
+import { useAppShell } from "@/context/AppShellContext";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAuth } from "@/providers/AuthProvider";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -38,6 +40,7 @@ function SettingsSection({
   title: string;
 }) {
   const { colors } = useAppTheme();
+  const responsive = useResponsiveLayout();
 
   return (
     <Card>
@@ -45,7 +48,11 @@ function SettingsSection({
       <Text style={{ marginTop: 4, color: colors.foregroundMuted, fontSize: 13, lineHeight: 19 }}>
         {description}
       </Text>
-      <View style={{ marginTop: spacing.lg }}>{children}</View>
+      <View
+        style={{ marginTop: responsive.isMobile ? spacing.md : spacing.lg }}
+      >
+        {children}
+      </View>
     </Card>
   );
 }
@@ -62,9 +69,10 @@ function PreferenceRow({
   value: boolean;
 }) {
   const { colors } = useAppTheme();
+  const responsive = useResponsiveLayout();
 
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.lg }}>
+    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: responsive.isCompact ? spacing.sm : spacing.lg }}>
       <View style={{ minWidth: 0, flex: 1 }}>
         <Text style={{ color: colors.foreground, fontSize: 14, fontWeight: "500" }}>{label}</Text>
         <Text style={{ marginTop: 3, color: colors.foregroundMuted, fontSize: 12, lineHeight: 17 }}>
@@ -86,6 +94,8 @@ function PreferenceRow({
 export default function SettingsScreen() {
   const { colors, mode, setMode } = useAppTheme();
   const { user } = useAuth();
+  const { drawerWidth, isDesktop } = useAppShell();
+  const responsive = useResponsiveLayout(isDesktop ? drawerWidth : 0);
   const [preferences, setPreferences] = useState(defaultPreferences);
   const [saved, setSaved] = useState(false);
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -126,7 +136,7 @@ export default function SettingsScreen() {
       action={saved ? <Badge label="Saved" tone="success" /> : null}
       contentStyle={{ maxWidth: 960 }}
     >
-      <View style={{ gap: spacing.sm }}>
+      <View style={{ gap: responsive.sectionGap }}>
         <SettingsSection
           title="Appearance"
           description="Choose how Workspace looks on this device. System follows your OS preference."
@@ -143,7 +153,9 @@ export default function SettingsScreen() {
           title="Notifications"
           description="These preferences are stored locally and apply to this device."
         >
-          <View style={{ gap: spacing.xl }}>
+          <View
+            style={{ gap: responsive.isMobile ? spacing.md : spacing.xl }}
+          >
             <PreferenceRow
               label="Project updates"
               description="Receive updates when project status or ownership changes."
@@ -166,15 +178,15 @@ export default function SettingsScreen() {
         >
           <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
+              flexDirection: responsive.isCompact ? "column" : "row",
+              alignItems: responsive.isCompact ? "flex-start" : "center",
               justifyContent: "space-between",
-              gap: spacing.md,
+              gap: responsive.isCompact ? spacing.sm : spacing.md,
               borderWidth: 1,
               borderColor: colors.border,
               borderRadius: radii.md,
               backgroundColor: colors.surfaceMuted,
-              padding: spacing.md,
+              padding: responsive.isCompact ? spacing.sm : spacing.md,
             }}
           >
             <View style={{ minWidth: 0, flex: 1 }}>

@@ -74,6 +74,7 @@ function ProtectedNavigator() {
       <Drawer.Screen name="dashboard" options={{ title: "Dashboard" }} />
       <Drawer.Screen name="projects" options={{ title: "Projects" }} />
       <Drawer.Screen name="teams" options={{ title: "Teams" }} />
+      <Drawer.Screen name="profile" options={{ title: "Profile" }} />
       <Drawer.Screen name="settings" options={{ title: "Settings" }} />
     </Drawer>
   );

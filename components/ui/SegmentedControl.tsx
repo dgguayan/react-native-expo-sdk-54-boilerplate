@@ -1,6 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 
 import { radii, spacing } from "@/constants/theme";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 export interface SegmentOption<Value extends string> {
@@ -22,13 +23,14 @@ export function SegmentedControl<Value extends string>({
   value,
 }: SegmentedControlProps<Value>) {
   const { colors } = useAppTheme();
+  const responsive = useResponsiveLayout();
 
   return (
     <View
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="tablist"
       style={{
-        alignSelf: "flex-start",
+        alignSelf: responsive.isCompact ? "stretch" : "flex-start",
         flexDirection: "row",
         flexWrap: "wrap",
         gap: spacing.xxs,
@@ -47,12 +49,13 @@ export function SegmentedControl<Value extends string>({
             onPress={() => onChange(option.value)}
             style={({ pressed }) => ({
               minHeight: 36,
+              flexGrow: responsive.isCompact ? 1 : 0,
               justifyContent: "center",
               borderWidth: 1,
               borderColor: selected ? colors.border : "transparent",
               borderRadius: radii.sm,
               backgroundColor: selected ? colors.surface : "transparent",
-              paddingHorizontal: spacing.md,
+              paddingHorizontal: responsive.isCompact ? 10 : spacing.md,
               opacity: pressed ? 0.72 : 1,
             })}
           >

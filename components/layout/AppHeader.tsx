@@ -1,10 +1,11 @@
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { UserAvatar } from "@/components/account/UserAvatar";
 import { IconButton } from "@/components/ui/IconButton";
 import { layout, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
-import { useAuth } from "@/providers/AuthProvider";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface AppHeaderProps {
@@ -12,14 +13,10 @@ interface AppHeaderProps {
   title: string;
 }
 
-function getInitial(email?: string): string {
-  return email?.trim().charAt(0).toUpperCase() || "U";
-}
-
 export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
   const { colors, resolvedTheme, toggleTheme } = useAppTheme();
   const { desktopCollapsed, isDesktop } = useAppShell();
-  const { user } = useAuth();
+  const responsive = useResponsiveLayout();
 
   return (
     <SafeAreaView
@@ -29,14 +26,22 @@ export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
       <View
         accessibilityRole="toolbar"
         style={{
-          minHeight: layout.headerHeight,
+          minHeight: responsive.isCompact
+            ? 56
+            : responsive.isMobile
+              ? 60
+              : layout.headerHeight,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: spacing.md,
+          gap: responsive.isCompact ? spacing.xs : spacing.md,
           borderBottomWidth: 1,
           borderBottomColor: colors.border,
-          paddingHorizontal: isDesktop ? spacing.xl : spacing.md,
+          paddingHorizontal: isDesktop
+            ? spacing.xl
+            : responsive.isCompact
+              ? spacing.xs
+              : spacing.md,
         }}
       >
         <View
@@ -45,7 +50,7 @@ export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
             flex: 1,
             flexDirection: "row",
             alignItems: "center",
-            gap: spacing.sm,
+            gap: responsive.isCompact ? spacing.xs : spacing.sm,
           }}
         >
           <IconButton
@@ -77,7 +82,13 @@ export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
           </Text>
         </View>
 
-        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xs }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: responsive.isCompact ? spacing.xxs : spacing.xs,
+          }}
+        >
           <IconButton
             icon={resolvedTheme === "dark" ? "sunny-outline" : "moon-outline"}
             label={
@@ -85,28 +96,7 @@ export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
             }
             onPress={toggleTheme}
           />
-          <View
-            accessibilityLabel={user?.email ? `Signed in as ${user.email}` : "User account"}
-            accessibilityRole="image"
-            style={{
-              width: 34,
-              height: 34,
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 17,
-              backgroundColor: colors.primary,
-            }}
-          >
-            <Text
-              style={{
-                color: colors.primaryForeground,
-                fontSize: 13,
-                fontWeight: "700",
-              }}
-            >
-              {getInitial(user?.email)}
-            </Text>
-          </View>
+          <UserAvatar size={responsive.isCompact ? 30 : 34} />
         </View>
       </View>
     </SafeAreaView>

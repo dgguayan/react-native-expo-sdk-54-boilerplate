@@ -4,10 +4,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppLogo } from "@/components/AppLogo";
 import { radii, spacing } from "@/constants/theme";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 export function AppLoadingScreen() {
   const { colors } = useAppTheme();
+  const responsive = useResponsiveLayout();
   const opacity = useRef(new Animated.Value(0.45)).current;
 
   useEffect(() => {
@@ -38,10 +40,15 @@ export function AppLoadingScreen() {
           maxWidth: 520,
           alignSelf: "center",
           justifyContent: "center",
-          padding: spacing.xl,
+          padding: responsive.isCompact ? spacing.md : spacing.xl,
         }}
       >
-        <View style={{ alignItems: "center", marginBottom: spacing["2xl"] }}>
+        <View
+          style={{
+            alignItems: "center",
+            marginBottom: responsive.isCompact ? spacing.xl : spacing["2xl"],
+          }}
+        >
           <AppLogo />
         </View>
         <Animated.View style={{ gap: spacing.sm, opacity }}>

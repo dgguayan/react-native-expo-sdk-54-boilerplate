@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Text, useWindowDimensions, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { StateView } from "@/components/feedback/StateView";
 import { Screen } from "@/components/layout/Screen";
@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 type TeamTab = "members" | "invitations";
@@ -29,11 +30,20 @@ const members = [
 
 export default function TeamsScreen() {
   const { colors } = useAppTheme();
-  const { width } = useWindowDimensions();
   const { drawerWidth, isDesktop } = useAppShell();
+  const responsive = useResponsiveLayout(isDesktop ? drawerWidth : 0);
   const [activeTab, setActiveTab] = useState<TeamTab>("members");
-  const availableWidth = width - (isDesktop ? drawerWidth : 0);
-  const showEmail = availableWidth >= 700;
+  const showEmail = responsive.contentWidth >= 700;
+  const roleWidth = responsive.isCompact
+    ? 72
+    : responsive.isMobile
+      ? 80
+      : 92;
+  const rowPadding = responsive.isCompact
+    ? spacing.sm
+    : responsive.isMobile
+      ? spacing.md
+      : spacing.lg;
 
   return (
     <Screen
@@ -41,7 +51,9 @@ export default function TeamsScreen() {
       description="Understand who has access and how responsibilities are distributed."
       action={<Badge label="6 members" tone="brand" />}
     >
-      <View style={{ marginBottom: spacing.lg }}>
+      <View
+        style={{ marginBottom: responsive.isMobile ? spacing.md : spacing.lg }}
+      >
         <SegmentedControl
           accessibilityLabel="Team view"
           onChange={setActiveTab}
@@ -60,13 +72,13 @@ export default function TeamsScreen() {
         <Card padded={false} style={{ overflow: "hidden" }}>
           <View
             style={{
-              minHeight: 46,
+              minHeight: responsive.isCompact ? 40 : 46,
               flexDirection: "row",
               alignItems: "center",
               borderBottomWidth: 1,
               borderBottomColor: colors.border,
               backgroundColor: colors.surfaceMuted,
-              paddingHorizontal: spacing.lg,
+              paddingHorizontal: rowPadding,
             }}
           >
             <Text style={{ flex: 1.4, color: colors.foregroundMuted, fontSize: 11, fontWeight: "600", letterSpacing: 0.5, textTransform: "uppercase" }}>
@@ -77,7 +89,7 @@ export default function TeamsScreen() {
                 Email
               </Text>
             ) : null}
-            <Text style={{ width: 92, color: colors.foregroundMuted, fontSize: 11, fontWeight: "600", letterSpacing: 0.5, textTransform: "uppercase" }}>
+            <Text style={{ width: roleWidth, color: colors.foregroundMuted, fontSize: 11, fontWeight: "600", letterSpacing: 0.5, textTransform: "uppercase" }}>
               Role
             </Text>
           </View>
@@ -87,20 +99,20 @@ export default function TeamsScreen() {
               key={member.email}
               accessibilityLabel={`${member.name}, ${member.role}, ${member.online ? "online" : "offline"}`}
               style={{
-                minHeight: 68,
+                minHeight: responsive.isCompact ? 58 : responsive.isMobile ? 62 : 68,
                 flexDirection: "row",
                 alignItems: "center",
                 borderBottomWidth: index === members.length - 1 ? 0 : 1,
                 borderBottomColor: colors.border,
-                paddingHorizontal: spacing.lg,
+                paddingHorizontal: rowPadding,
               }}
             >
               <View style={{ flex: 1.4, minWidth: 0, flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
                 <View style={{ position: "relative" }}>
                   <View
                     style={{
-                      width: 38,
-                      height: 38,
+                      width: responsive.isCompact ? 34 : 38,
+                      height: responsive.isCompact ? 34 : 38,
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: radii.full,
@@ -141,8 +153,10 @@ export default function TeamsScreen() {
                   {member.email}
                 </Text>
               ) : null}
-              <View style={{ width: 92, flexDirection: "row", alignItems: "center", gap: 5 }}>
-                <Ionicons name="shield-checkmark-outline" size={14} color={colors.foregroundMuted} />
+              <View style={{ width: roleWidth, flexDirection: "row", alignItems: "center", gap: 5 }}>
+                {!responsive.isCompact ? (
+                  <Ionicons name="shield-checkmark-outline" size={14} color={colors.foregroundMuted} />
+                ) : null}
                 <Text numberOfLines={1} style={{ color: colors.foregroundMuted, fontSize: 12 }}>
                   {member.role}
                 </Text>

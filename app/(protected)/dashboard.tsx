@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import type { ComponentProps } from "react";
-import { Text, useWindowDimensions, View, type DimensionValue } from "react-native";
+import { Text, View, type DimensionValue } from "react-native";
 
 import { Button } from "@/components/Button";
 import { Screen } from "@/components/layout/Screen";
@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAuth } from "@/providers/AuthProvider";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -47,12 +48,15 @@ function firstNameFromEmail(email?: string): string {
 export default function DashboardScreen() {
   const { colors } = useAppTheme();
   const { user } = useAuth();
-  const { width } = useWindowDimensions();
   const { drawerWidth, isDesktop } = useAppShell();
-  const availableWidth = width - (isDesktop ? drawerWidth : 0);
+  const responsive = useResponsiveLayout(isDesktop ? drawerWidth : 0);
   const metricWidth: DimensionValue =
-    availableWidth >= 1120 ? "23.5%" : availableWidth >= 620 ? "48.5%" : "100%";
-  const stackSections = availableWidth < 920;
+    responsive.contentWidth >= 1120
+      ? "23.5%"
+      : responsive.contentWidth >= 340
+        ? "48.2%"
+        : "100%";
+  const stackSections = responsive.contentWidth < 900;
 
   return (
     <Screen
@@ -64,19 +68,35 @@ export default function DashboardScreen() {
         </Link>
       }
     >
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.sm }}>
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: responsive.sectionGap,
+        }}
+      >
         {metrics.map((metric) => (
           <Card key={metric.label} style={{ width: metricWidth, minWidth: 0 }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                gap: responsive.isCompact ? spacing.xs : spacing.md,
+              }}
+            >
               <View style={{ minWidth: 0, flex: 1 }}>
                 <Text style={{ color: colors.foregroundMuted, fontSize: 13, fontWeight: "500" }}>
                   {metric.label}
                 </Text>
                 <Text
                   style={{
-                    marginTop: spacing.xs,
+                    marginTop: responsive.isMobile ? spacing.xxs : spacing.xs,
                     color: colors.foreground,
-                    fontSize: 28,
+                    fontSize: responsive.isCompact
+                      ? 24
+                      : responsive.isMobile
+                        ? 26
+                        : 28,
                     fontWeight: "700",
                     letterSpacing: -0.6,
                   }}
@@ -86,18 +106,29 @@ export default function DashboardScreen() {
               </View>
               <View
                 style={{
-                  width: 40,
-                  height: 40,
+                  width: responsive.isCompact ? 34 : responsive.isMobile ? 36 : 40,
+                  height: responsive.isCompact ? 34 : responsive.isMobile ? 36 : 40,
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: radii.md,
                   backgroundColor: colors.brandSoft,
                 }}
               >
-                <Ionicons name={metric.icon} size={20} color={colors.brand} />
+                <Ionicons
+                  name={metric.icon}
+                  size={responsive.isMobile ? 18 : 20}
+                  color={colors.brand}
+                />
               </View>
             </View>
-            <Text style={{ marginTop: spacing.md, color: colors.success, fontSize: 12, fontWeight: "500" }}>
+            <Text
+              style={{
+                marginTop: responsive.isMobile ? spacing.xs : spacing.md,
+                color: colors.success,
+                fontSize: 12,
+                fontWeight: "500",
+              }}
+            >
               {metric.change}
             </Text>
           </Card>
@@ -106,10 +137,10 @@ export default function DashboardScreen() {
 
       <View
         style={{
-          marginTop: spacing.sm,
+          marginTop: responsive.sectionGap,
           flexDirection: stackSections ? "column" : "row",
           alignItems: "stretch",
-          gap: spacing.sm,
+          gap: responsive.sectionGap,
         }}
       >
         <Card style={{ flex: stackSections ? undefined : 1.55 }}>
@@ -125,7 +156,12 @@ export default function DashboardScreen() {
             <Badge label="3 active" tone="neutral" />
           </View>
 
-          <View style={{ gap: spacing.lg, marginTop: spacing.xl }}>
+          <View
+            style={{
+              gap: responsive.isMobile ? spacing.md : spacing.lg,
+              marginTop: responsive.isMobile ? spacing.md : spacing.xl,
+            }}
+          >
             {projects.map((project) => (
               <View key={project.name} style={{ gap: spacing.xs }}>
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.sm }}>
@@ -154,7 +190,12 @@ export default function DashboardScreen() {
           <Text style={{ marginTop: 3, color: colors.foregroundMuted, fontSize: 12 }}>
             Latest workspace updates
           </Text>
-          <View style={{ gap: spacing.lg, marginTop: spacing.xl }}>
+          <View
+            style={{
+              gap: responsive.isMobile ? spacing.md : spacing.lg,
+              marginTop: responsive.isMobile ? spacing.md : spacing.xl,
+            }}
+          >
             {activity.map((item) => (
               <View key={item.title} style={{ flexDirection: "row", gap: spacing.sm }}>
                 <View

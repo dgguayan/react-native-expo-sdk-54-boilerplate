@@ -1,7 +1,8 @@
 import type { PropsWithChildren } from "react";
 import { type StyleProp, View, type ViewProps, type ViewStyle } from "react-native";
 
-import { radii, spacing, surfaceShadow } from "@/constants/theme";
+import { radii, surfaceShadow } from "@/constants/theme";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface CardProps extends ViewProps {
@@ -16,6 +17,7 @@ export function Card({
   ...viewProps
 }: PropsWithChildren<CardProps>) {
   const { colors, resolvedTheme } = useAppTheme();
+  const responsive = useResponsiveLayout();
 
   return (
     <View
@@ -25,7 +27,7 @@ export function Card({
           borderWidth: 1,
           borderColor: colors.border,
           backgroundColor: colors.surface,
-          padding: padded ? spacing.lg : 0,
+          padding: padded ? responsive.cardPadding : 0,
         },
         surfaceShadow(resolvedTheme),
         style,

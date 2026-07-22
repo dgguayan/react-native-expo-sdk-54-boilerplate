@@ -1,7 +1,12 @@
 import type { ComponentProps } from "react";
 import type { Ionicons } from "@expo/vector-icons";
 
-export type AppRouteName = "dashboard" | "projects" | "teams" | "settings";
+export type AppRouteName =
+  | "dashboard"
+  | "projects"
+  | "teams"
+  | "profile"
+  | "settings";
 
 export interface NavigationItem {
   description: string;
@@ -9,6 +14,7 @@ export interface NavigationItem {
     | "/(protected)/dashboard"
     | "/(protected)/projects"
     | "/(protected)/teams"
+    | "/(protected)/profile"
     | "/(protected)/settings";
   icon: ComponentProps<typeof Ionicons>["name"];
   label: string;
@@ -42,12 +48,28 @@ export const mainNavigation = [
 export const settingsNavigation = {
   name: "settings",
   label: "Settings",
-  description: "Preferences and profile",
+  description: "Appearance and preferences",
   href: "/(protected)/settings",
   icon: "settings-outline",
 } as const satisfies NavigationItem;
 
-export const allNavigation = [...mainNavigation, settingsNavigation] as const;
+export const profileNavigation = {
+  name: "profile",
+  label: "Profile",
+  description: "Personal details",
+  href: "/(protected)/profile",
+  icon: "person-outline",
+} as const satisfies NavigationItem;
+
+export const accountNavigation = [
+  profileNavigation,
+  settingsNavigation,
+] as const;
+
+export const allNavigation = [
+  ...mainNavigation,
+  ...accountNavigation,
+] as const;
 
 export function getNavigationItem(
   routeName: string,

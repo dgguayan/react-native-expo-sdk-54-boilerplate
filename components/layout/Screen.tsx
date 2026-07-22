@@ -2,12 +2,13 @@ import type { PropsWithChildren, ReactNode } from "react";
 import {
   ScrollView,
   Text,
-  useWindowDimensions,
   View,
   type ViewStyle,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { layout, spacing } from "@/constants/theme";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface ScreenProps {
@@ -25,31 +26,41 @@ export function Screen({
   title,
 }: PropsWithChildren<ScreenProps>) {
   const { colors } = useAppTheme();
-  const { width } = useWindowDimensions();
-  const horizontalPadding = width < layout.mobileBreakpoint ? spacing.md : spacing.xl;
+  const insets = useSafeAreaInsets();
+  const responsive = useResponsiveLayout();
+  const stackHeader = responsive.frameWidth < 520;
 
   return (
     <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
+      automaticallyAdjustKeyboardInsets
+      contentInsetAdjustmentBehavior="never"
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={{
+        width: "100%",
         maxWidth: layout.contentMaxWidth,
         alignSelf: "center",
-        paddingHorizontal: horizontalPadding,
-        paddingTop: width < layout.mobileBreakpoint ? spacing.xl : spacing["2xl"],
-        paddingBottom: spacing["4xl"],
+        paddingHorizontal: responsive.pageHorizontalPadding,
+        paddingTop: responsive.pageTopPadding,
+        paddingBottom: Math.max(
+          responsive.pageBottomPadding,
+          insets.bottom + spacing.sm,
+        ),
         ...contentStyle,
       }}
     >
       <View
         style={{
-          flexDirection: width < 560 ? "column" : "row",
-          alignItems: width < 560 ? "stretch" : "flex-start",
+          flexDirection: stackHeader ? "column" : "row",
+          alignItems: stackHeader ? "stretch" : "flex-start",
           justifyContent: "space-between",
-          gap: spacing.md,
-          marginBottom: spacing.xl,
+          gap: responsive.isCompact ? spacing.sm : spacing.md,
+          marginBottom: responsive.isCompact
+            ? spacing.md
+            : responsive.isMobile
+              ? spacing.lg
+              : spacing.xl,
         }}
       >
         <View style={{ flex: 1 }}>
@@ -57,10 +68,10 @@ export function Screen({
             accessibilityRole="header"
             style={{
               color: colors.foreground,
-              fontSize: width < layout.mobileBreakpoint ? 25 : 29,
+              fontSize: responsive.titleFontSize,
               fontWeight: "700",
               letterSpacing: -0.6,
-              lineHeight: 36,
+              lineHeight: responsive.titleLineHeight,
             }}
           >
             {title}

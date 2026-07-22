@@ -4,7 +4,6 @@ import {
   Platform,
   ScrollView,
   Text,
-  useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,7 +11,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AppLogo } from "@/components/AppLogo";
 import { IconButton } from "@/components/ui/IconButton";
 import { Card } from "@/components/ui/Card";
-import { layout, radii, spacing } from "@/constants/theme";
+import { radii, spacing } from "@/constants/theme";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface AuthScaffoldProps {
@@ -28,8 +28,8 @@ export function AuthScaffold({
   title,
 }: PropsWithChildren<AuthScaffoldProps>) {
   const { colors, resolvedTheme, toggleTheme } = useAppTheme();
-  const { width } = useWindowDimensions();
-  const showBrandPanel = width >= 960;
+  const responsive = useResponsiveLayout();
+  const showBrandPanel = responsive.width >= 960;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
@@ -109,33 +109,44 @@ export function AuthScaffold({
               flexGrow: 1,
               alignItems: "center",
               justifyContent: "center",
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing["4xl"],
+              paddingHorizontal: responsive.isCompact ? spacing.sm : spacing.md,
+              paddingVertical: responsive.isCompact
+                ? spacing.sm
+                : responsive.isMobile
+                  ? spacing.xl
+                  : spacing["4xl"],
             }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             style={{ flex: 1 }}
           >
-            <View style={{ width: Math.min(430, Math.max(280, width - spacing["2xl"])) }}>
+            <View style={{ width: "100%", maxWidth: 430 }}>
               {!showBrandPanel ? (
-                <View style={{ alignItems: "center", marginBottom: spacing.xl }}>
+                <View
+                  style={{
+                    alignItems: "center",
+                    marginBottom: responsive.isCompact ? spacing.md : spacing.xl,
+                  }}
+                >
                   <AppLogo />
                 </View>
               ) : null}
               <Card
                 style={{
-                  borderRadius: width < layout.mobileBreakpoint ? radii.lg : radii.xl,
-                  padding: width < layout.mobileBreakpoint ? spacing.lg : spacing["2xl"],
+                  borderRadius: responsive.isMobile ? radii.lg : radii.xl,
+                  padding: responsive.isMobile
+                    ? responsive.cardPadding
+                    : spacing["2xl"],
                 }}
               >
                 <Text
                   accessibilityRole="header"
                   style={{
                     color: colors.foreground,
-                    fontSize: 25,
+                    fontSize: responsive.isCompact ? 23 : 25,
                     fontWeight: "700",
                     letterSpacing: -0.5,
-                    lineHeight: 32,
+                    lineHeight: responsive.isCompact ? 29 : 32,
                   }}
                 >
                   {title}
@@ -150,8 +161,23 @@ export function AuthScaffold({
                 >
                   {subtitle}
                 </Text>
-                <View style={{ gap: spacing.md, marginTop: spacing.xl }}>{children}</View>
-                {footer ? <View style={{ marginTop: spacing.xl }}>{footer}</View> : null}
+                <View
+                  style={{
+                    gap: responsive.isCompact ? spacing.sm : spacing.md,
+                    marginTop: responsive.isCompact ? spacing.md : spacing.xl,
+                  }}
+                >
+                  {children}
+                </View>
+                {footer ? (
+                  <View
+                    style={{
+                      marginTop: responsive.isCompact ? spacing.lg : spacing.xl,
+                    }}
+                  >
+                    {footer}
+                  </View>
+                ) : null}
               </Card>
             </View>
           </ScrollView>

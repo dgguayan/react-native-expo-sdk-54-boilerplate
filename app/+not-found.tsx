@@ -1,21 +1,24 @@
 import { Link } from "expo-router";
-import { Text, View } from "react-native";
+import { Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "@/components/Button";
 import { spacing } from "@/constants/theme";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function NotFoundScreen() {
   const { colors } = useAppTheme();
+  const responsive = useResponsiveLayout();
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: colors.background,
-        padding: spacing.xl,
+        padding: responsive.isCompact ? spacing.md : spacing.xl,
       }}
     >
       <Text style={{ color: colors.foregroundSubtle, fontSize: 13, fontWeight: "700" }}>
@@ -23,7 +26,7 @@ export default function NotFoundScreen() {
       </Text>
       <Text
         accessibilityRole="header"
-        style={{ marginTop: spacing.sm, color: colors.foreground, fontSize: 26, fontWeight: "700" }}
+        style={{ marginTop: spacing.sm, color: colors.foreground, fontSize: responsive.isCompact ? 23 : 26, fontWeight: "700", textAlign: "center" }}
       >
         Page not found
       </Text>
@@ -42,6 +45,6 @@ export default function NotFoundScreen() {
       <Link href="/" asChild>
         <Button title="Return home" style={{ marginTop: spacing.lg }} />
       </Link>
-    </View>
+    </SafeAreaView>
   );
 }

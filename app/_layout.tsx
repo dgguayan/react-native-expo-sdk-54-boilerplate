@@ -2,15 +2,19 @@ import "../global.css";
 
 import { Stack, type ErrorBoundaryProps } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+} from "react-native-safe-area-context";
 
 import { AppLoadingScreen } from "@/components/feedback/AppLoadingScreen";
 import { colorPalettes, radii, spacing } from "@/constants/theme";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { AppThemeProvider, useAppTheme } from "@/providers/ThemeProvider";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 
 function RootNavigator() {
   const { loading, session } = useAuth();
@@ -51,20 +55,21 @@ export default function RootLayout() {
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   const scheme = useColorScheme() ?? "light";
   const colors = colorPalettes[scheme];
+  const responsive = useResponsiveLayout();
 
   return (
-    <View
+    <SafeAreaView
       accessibilityRole="alert"
       style={{
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: colors.background,
-        padding: spacing.xl,
+        padding: responsive.isCompact ? spacing.md : spacing.xl,
       }}
     >
       <Text
-        style={{ color: colors.foreground, fontSize: 22, fontWeight: "700", textAlign: "center" }}
+        style={{ color: colors.foreground, fontSize: responsive.isCompact ? 20 : 22, fontWeight: "700", textAlign: "center" }}
       >
         Something went wrong
       </Text>
@@ -97,6 +102,6 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
           Try again
         </Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }

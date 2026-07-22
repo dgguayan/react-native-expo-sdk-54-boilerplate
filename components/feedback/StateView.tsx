@@ -3,6 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 import { Text, View } from "react-native";
 
 import { radii, spacing } from "@/constants/theme";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface StateViewProps {
@@ -21,6 +22,7 @@ export function StateView({
   tone = "neutral",
 }: StateViewProps) {
   const { colors } = useAppTheme();
+  const responsive = useResponsiveLayout();
   const isDanger = tone === "danger";
 
   return (
@@ -33,14 +35,18 @@ export function StateView({
         borderColor: isDanger ? colors.danger : colors.borderStrong,
         borderRadius: radii.lg,
         backgroundColor: isDanger ? colors.dangerSoft : colors.surface,
-        paddingHorizontal: spacing.xl,
-        paddingVertical: spacing["3xl"],
+        paddingHorizontal: responsive.isMobile ? spacing.md : spacing.xl,
+        paddingVertical: responsive.isCompact
+          ? spacing.xl
+          : responsive.isMobile
+            ? spacing["2xl"]
+            : spacing["3xl"],
       }}
     >
       <View
         style={{
-          width: 46,
-          height: 46,
+          width: responsive.isCompact ? 42 : 46,
+          height: responsive.isCompact ? 42 : 46,
           alignItems: "center",
           justifyContent: "center",
           borderRadius: radii.full,
@@ -55,7 +61,7 @@ export function StateView({
       </View>
       <Text
         style={{
-          marginTop: spacing.md,
+          marginTop: responsive.isCompact ? spacing.sm : spacing.md,
           color: colors.foreground,
           fontSize: 16,
           fontWeight: "600",
@@ -75,7 +81,13 @@ export function StateView({
       >
         {description}
       </Text>
-      {action ? <View style={{ marginTop: spacing.lg }}>{action}</View> : null}
+      {action ? (
+        <View
+          style={{ marginTop: responsive.isCompact ? spacing.md : spacing.lg }}
+        >
+          {action}
+        </View>
+      ) : null}
     </View>
   );
 }

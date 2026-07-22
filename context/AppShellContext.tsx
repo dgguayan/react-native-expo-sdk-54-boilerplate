@@ -15,7 +15,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 
-import { layout } from "@/constants/theme";
+import { layout, spacing } from "@/constants/theme";
 
 const SIDEBAR_STORAGE_KEY = "desktop-sidebar-collapsed";
 
@@ -79,12 +79,14 @@ export function AppShellProvider({ children }: PropsWithChildren) {
     });
   }, []);
 
+  const drawerGutter =
+    width < layout.compactBreakpoint ? spacing.md : spacing.xl;
   const drawerWidth =
     breakpoint === "desktop"
       ? desktopCollapsed
         ? layout.sidebarCollapsed
         : layout.sidebarExpanded
-      : Math.min(layout.drawerMaxWidth, Math.max(248, width - 24));
+      : Math.min(layout.drawerMaxWidth, Math.max(0, width - drawerGutter));
 
   const value = useMemo<AppShellContextValue>(
     () => ({

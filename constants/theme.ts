@@ -89,6 +89,8 @@ export const radii = {
 } as const;
 
 export const layout = {
+  compactBreakpoint: 380,
+  phoneBreakpoint: 600,
   mobileBreakpoint: 768,
   desktopBreakpoint: 1180,
   sidebarExpanded: 272,

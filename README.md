@@ -21,9 +21,10 @@ The authenticated shell adapts at runtime without duplicating route definitions:
 | --- | --- |
 | Desktop (1180px and wider) | Permanent sidebar with persisted expanded and icon-only modes |
 | Tablet (768px to 1179px) | Overlay drawer opened from the header |
-| Mobile (below 768px) | Hidden, swipe-enabled native drawer with a compact header |
+| Mobile (380px to 767px) | Hidden, swipe-enabled native drawer with compact page and card spacing |
+| Compact phone/foldable (below 380px) | Reduced chrome, reflowing controls, and a viewport-safe drawer |
 
-Settings and logout live in the fixed drawer footer. Dashboard, Projects, Teams, and Settings use the same typed route registry, so links, active states, browser history, native back navigation, and deep links stay aligned.
+The fixed drawer footer contains one personal Account trigger instead of permanent utility links. It opens an anchored, keyboard-accessible popover on the web and a safe-area-aware bottom sheet on Android and iOS. Profile, Settings, and the separated destructive logout action share the same typed action model, while Dashboard, Projects, and Teams remain focused primary navigation.
 
 ## Project structure
 
@@ -35,6 +36,7 @@ app/
   (auth)/                     Public sign-in and registration stack
   (protected)/                Authenticated drawer routes
 components/
+  account/                    Avatar and adaptive account menu
   auth/                       Shared public authentication layout
   feedback/                   Loading, empty, and error states
   layout/                     Header and responsive screen container
@@ -45,11 +47,11 @@ constants/
   theme.ts                    Color, spacing, radius, typography, and layout tokens
 context/
   AppShellContext.tsx         Responsive breakpoint and sidebar state
-hooks/                        Platform-aware hooks
+hooks/                        Platform-aware color and responsive-layout hooks
 lib/
   supabase.ts                 Universal Supabase client and session storage
 providers/
-  AuthProvider.tsx            Authentication state and actions
+  AuthProvider.tsx            Authentication state and profile actions
   ThemeProvider.tsx           System/light/dark preference and navigation theme
 types/                        Shared TypeScript contracts
 ```
@@ -68,7 +70,7 @@ Authentication is client-side on static web exports. Sensitive authorization mus
 
 The theme provider supports system, light, and dark modes. The selected mode, desktop sidebar state, and device notification preferences persist in AsyncStorage.
 
-The design token layer intentionally uses React Native styles for dynamic colors, focus states, responsive dimensions, and cross-platform shadows. NativeWind remains configured for static utility styling when it is the clearest option.
+The design token layer intentionally uses React Native styles for dynamic colors, focus states, responsive dimensions, and cross-platform shadows. Shared responsive metrics calculate page padding, card density, typography, and usable content width for compact phones, phones, tablets, and desktop. NativeWind remains configured for static utility styling when it is the clearest option.
 
 ## Environment
 
@@ -105,6 +107,8 @@ Native release builds should use EAS Build or local native tooling supported by 
 
 - Expo Router remains the source of truth because it supplies nested native navigation, typed routes, browser URLs, static web output, and deep links from one filesystem hierarchy.
 - React Navigation Drawer is the only added runtime dependency. SDK 54 requires it for Expo Router drawers, and it supplies native swipe gestures and state-preserving navigation.
+- The Account menu uses React Native's existing Modal and Animated primitives. One shared menu owns navigation, profile data, keyboard handling, and logout state; only the web popover and native bottom-sheet presentation differ.
+- Responsive decisions use usable content width after reserved sidebar space and page gutters. Compact-phone density is centralized instead of repeated as one-off platform checks.
 - React context is used only for auth, theme, and application-shell UI state. A global store is not warranted by the current data model.
 - The screen examples contain complete local interactions and representative data. Replace those module-level datasets with repository/API hooks as the backend domain is introduced; the shell and route contracts do not need to change.
 - Accessibility labels, roles, selected/busy states, 44px touch targets, keyboard focus treatments, and reduced layout complexity are built into shared primitives rather than repeated per screen.

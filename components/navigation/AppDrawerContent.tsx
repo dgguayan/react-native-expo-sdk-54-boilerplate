@@ -5,15 +5,12 @@ import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AccountMenu } from "@/components/account/AccountMenu";
 import { AppLogo } from "@/components/AppLogo";
-import {
-  mainNavigation,
-  settingsNavigation,
-  type NavigationItem,
-} from "@/constants/navigation";
+import { mainNavigation, type NavigationItem } from "@/constants/navigation";
 import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
-import { useAuth } from "@/providers/AuthProvider";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface NavigationRowProps {
@@ -30,6 +27,7 @@ function NavigationRow({
   onPress,
 }: NavigationRowProps) {
   const { colors } = useAppTheme();
+  const responsive = useResponsiveLayout();
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
 
@@ -50,7 +48,7 @@ function NavigationRow({
           flexDirection: "row",
           alignItems: "center",
           justifyContent: collapsed ? "center" : "flex-start",
-          gap: spacing.sm,
+          gap: responsive.isCompact ? spacing.xs : spacing.sm,
           borderWidth: 1,
           borderColor: focused ? colors.focusRing : "transparent",
           borderRadius: radii.md,
@@ -59,7 +57,11 @@ function NavigationRow({
             : hovered || pressed
               ? colors.surfaceMuted
               : "transparent",
-          paddingHorizontal: collapsed ? 0 : spacing.sm,
+          paddingHorizontal: collapsed
+            ? 0
+            : responsive.isCompact
+              ? spacing.xs
+              : spacing.sm,
           opacity: pressed ? 0.72 : 1,
         })}
       >
@@ -77,7 +79,7 @@ function NavigationRow({
         ) : null}
         <Ionicons
           name={item.icon}
-          size={20}
+          size={responsive.isCompact ? 19 : 20}
           color={isActive ? colors.foreground : colors.foregroundMuted}
         />
         {!collapsed ? (
@@ -86,7 +88,7 @@ function NavigationRow({
             style={{
               flex: 1,
               color: isActive ? colors.foreground : colors.foregroundMuted,
-              fontSize: 14,
+              fontSize: responsive.isCompact ? 13 : 14,
               fontWeight: isActive ? "600" : "500",
             }}
           >
@@ -124,18 +126,12 @@ function NavigationRow({
   );
 }
 
-function getInitial(email?: string): string {
-  return email?.trim().charAt(0).toUpperCase() || "U";
-}
-
 export function AppDrawerContent(props: DrawerContentComponentProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { colors } = useAppTheme();
   const { desktopCollapsed, isDesktop } = useAppShell();
-  const { signOut, user } = useAuth();
-  const [logoutError, setLogoutError] = useState<string | null>(null);
-  const [loggingOut, setLoggingOut] = useState(false);
+  const responsive = useResponsiveLayout();
   const collapsed = isDesktop && desktopCollapsed;
 
   const navigate = (item: NavigationItem) => {
@@ -146,14 +142,6 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
   const isActive = (item: NavigationItem) =>
     pathname === `/${item.name}` || pathname.startsWith(`/${item.name}/`);
 
-  const handleLogout = async () => {
-    setLogoutError(null);
-    setLoggingOut(true);
-    const { error } = await signOut();
-    setLoggingOut(false);
-    if (error) setLogoutError(error);
-  };
-
   return (
     <SafeAreaView
       edges={["top", "bottom"]}
@@ -161,13 +149,17 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
     >
       <View
         style={{
-          minHeight: 68,
+          minHeight: isDesktop ? 68 : responsive.isCompact ? 58 : 62,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: collapsed ? "center" : "flex-start",
           borderBottomWidth: 1,
           borderBottomColor: colors.border,
-          paddingHorizontal: collapsed ? spacing.sm : spacing.md,
+          paddingHorizontal: collapsed
+            ? spacing.sm
+            : responsive.isCompact
+              ? spacing.sm
+              : spacing.md,
         }}
       >
         <AppLogo compact={collapsed} />
@@ -177,7 +169,11 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
         contentContainerStyle={{
           gap: spacing.xxs,
           paddingHorizontal: spacing.sm,
-          paddingVertical: spacing.lg,
+          paddingVertical: responsive.isCompact
+            ? spacing.sm
+            : responsive.isMobile
+              ? spacing.md
+              : spacing.lg,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -209,96 +205,17 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
 
       <View
         style={{
-          gap: spacing.xs,
           borderTopWidth: 1,
           borderTopColor: colors.border,
-          padding: spacing.sm,
+          padding: responsive.isCompact ? spacing.xs : spacing.sm,
         }}
       >
-        <NavigationRow
+        <AccountMenu
           collapsed={collapsed}
-          isActive={isActive(settingsNavigation)}
-          item={settingsNavigation}
-          onPress={() => navigate(settingsNavigation)}
+          onNavigate={() => {
+            if (!isDesktop) props.navigation.closeDrawer();
+          }}
         />
-
-        {!collapsed ? (
-          <View
-            style={{
-              marginTop: spacing.xs,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: spacing.sm,
-              borderTopWidth: 1,
-              borderTopColor: colors.border,
-              paddingHorizontal: spacing.xs,
-              paddingTop: spacing.md,
-            }}
-          >
-            <View
-              style={{
-                width: 36,
-                height: 36,
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: radii.full,
-                backgroundColor: colors.brandSoft,
-              }}
-            >
-              <Text style={{ color: colors.brand, fontSize: 13, fontWeight: "700" }}>
-                {getInitial(user?.email)}
-              </Text>
-            </View>
-            <View style={{ minWidth: 0, flex: 1 }}>
-              <Text
-                numberOfLines={1}
-                style={{ color: colors.foreground, fontSize: 13, fontWeight: "600" }}
-              >
-                Account
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={{ marginTop: 2, color: colors.foregroundMuted, fontSize: 11 }}
-              >
-                {user?.email ?? "Signed in"}
-              </Text>
-            </View>
-          </View>
-        ) : null}
-
-        <Pressable
-          accessibilityLabel="Log out"
-          accessibilityRole="button"
-          accessibilityState={{ busy: loggingOut }}
-          disabled={loggingOut}
-          onPress={handleLogout}
-          style={({ pressed }) => ({
-            minHeight: 44,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: collapsed ? "center" : "flex-start",
-            gap: spacing.sm,
-            borderRadius: radii.md,
-            backgroundColor: pressed ? colors.dangerSoft : "transparent",
-            paddingHorizontal: collapsed ? 0 : spacing.sm,
-            opacity: loggingOut ? 0.5 : pressed ? 0.72 : 1,
-          })}
-        >
-          <Ionicons name="log-out-outline" size={20} color={colors.danger} />
-          {!collapsed ? (
-            <Text style={{ color: colors.danger, fontSize: 14, fontWeight: "500" }}>
-              {loggingOut ? "Logging out…" : "Log out"}
-            </Text>
-          ) : null}
-        </Pressable>
-        {logoutError && !collapsed ? (
-          <Text
-            accessibilityLiveRegion="polite"
-            style={{ color: colors.danger, fontSize: 11, lineHeight: 15 }}
-          >
-            {logoutError}
-          </Text>
-        ) : null}
       </View>
     </SafeAreaView>
   );

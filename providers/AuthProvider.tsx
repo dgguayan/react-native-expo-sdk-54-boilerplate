@@ -69,9 +69,32 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return { error: error?.message ?? null };
   }, []);
 
+  const updateProfile = useCallback(async (fullName: string) => {
+    const { data, error } = await supabase.auth.updateUser({
+      data: { full_name: fullName.trim() },
+    });
+
+    if (data.user) {
+      setUser(data.user);
+      setSession((currentSession) =>
+        currentSession ? { ...currentSession, user: data.user } : currentSession,
+      );
+    }
+
+    return { error: error?.message ?? null };
+  }, []);
+
   const value = useMemo<AuthContextType>(
-    () => ({ session, user, loading, signIn, signUp, signOut }),
-    [loading, session, signIn, signOut, signUp, user],
+    () => ({
+      session,
+      user,
+      loading,
+      signIn,
+      signUp,
+      signOut,
+      updateProfile,
+    }),
+    [loading, session, signIn, signOut, signUp, updateProfile, user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
