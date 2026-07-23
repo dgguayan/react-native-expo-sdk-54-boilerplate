@@ -41,7 +41,7 @@ components/
   feedback/                   Loading, empty, and error states
   layout/                     Header and responsive screen container
   navigation/                 Custom drawer content
-  ui/                         Reusable card, badge, progress, and control primitives
+  ui/                         Reusable inline, card, badge, progress, and control primitives
 constants/
   navigation.ts               Typed application route registry
   theme.ts                    Color, spacing, radius, typography, and layout tokens
@@ -109,6 +109,7 @@ Native release builds should use EAS Build or local native tooling supported by 
 - React Navigation Drawer is the only added runtime dependency. SDK 54 requires it for Expo Router drawers, and it supplies native swipe gestures and state-preserving navigation.
 - The Account menu uses React Native's existing Modal and Animated primitives. One shared menu owns navigation, profile data, keyboard handling, and logout state; only the web popover and native bottom-sheet presentation differ.
 - Responsive decisions use usable content width after reserved sidebar space and page gutters. Compact-phone density is centralized instead of repeated as one-off platform checks.
+- Icon-and-label controls use one inline layout contract: non-wrapping rows, non-shrinking icon slots, shrinkable text, and single-line truncation remain consistent across native and web targets.
 - React context is used only for auth, theme, and application-shell UI state. A global store is not warranted by the current data model.
 - The screen examples contain complete local interactions and representative data. Replace those module-level datasets with repository/API hooks as the backend domain is introduced; the shell and route contracts do not need to change.
 - Accessibility labels, roles, selected/busy states, 44px touch targets, keyboard focus treatments, and reduced layout complexity are built into shared primitives rather than repeated per screen.

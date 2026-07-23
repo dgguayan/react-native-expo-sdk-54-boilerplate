@@ -7,6 +7,7 @@ import { Button } from "@/components/Button";
 import { Screen } from "@/components/layout/Screen";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { inlineStyles } from "@/components/ui/Inline";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
@@ -78,14 +79,16 @@ export default function DashboardScreen() {
         {metrics.map((metric) => (
           <Card key={metric.label} style={{ width: metricWidth, minWidth: 0 }}>
             <View
-              style={{
-                flexDirection: "row",
+              style={[
+                inlineStyles.row,
+                {
                 justifyContent: "space-between",
                 gap: responsive.isCompact ? spacing.xs : spacing.md,
-              }}
+                },
+              ]}
             >
               <View style={{ minWidth: 0, flex: 1 }}>
-                <Text style={{ color: colors.foregroundMuted, fontSize: 13, fontWeight: "500" }}>
+                <Text numberOfLines={1} style={{ color: colors.foregroundMuted, fontSize: 13, fontWeight: "500" }}>
                   {metric.label}
                 </Text>
                 <Text
@@ -105,14 +108,17 @@ export default function DashboardScreen() {
                 </Text>
               </View>
               <View
-                style={{
-                  width: responsive.isCompact ? 34 : responsive.isMobile ? 36 : 40,
-                  height: responsive.isCompact ? 34 : responsive.isMobile ? 36 : 40,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: radii.md,
-                  backgroundColor: colors.brandSoft,
-                }}
+                style={[
+                  inlineStyles.icon,
+                  {
+                    width: responsive.isCompact ? 34 : responsive.isMobile ? 36 : 40,
+                    height: responsive.isCompact ? 34 : responsive.isMobile ? 36 : 40,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: radii.md,
+                    backgroundColor: colors.brandSoft,
+                  },
+                ]}
               >
                 <Ionicons
                   name={metric.icon}

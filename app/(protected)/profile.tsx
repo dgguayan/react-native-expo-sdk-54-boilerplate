@@ -8,6 +8,7 @@ import { Input } from "@/components/Input";
 import { Screen } from "@/components/layout/Screen";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { Inline, inlineStyles } from "@/components/ui/Inline";
 import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
@@ -40,20 +41,23 @@ function DetailRow({
   const responsive = useResponsiveLayout();
 
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
+    <Inline gap={spacing.sm}>
       <View
-        style={{
-          width: responsive.isCompact ? 32 : 36,
-          height: responsive.isCompact ? 32 : 36,
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: radii.md,
-          backgroundColor: colors.accent,
-        }}
+        style={[
+          inlineStyles.icon,
+          {
+            width: responsive.isCompact ? 32 : 36,
+            height: responsive.isCompact ? 32 : 36,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: radii.md,
+            backgroundColor: colors.accent,
+          },
+        ]}
       >
         <Ionicons name={icon} size={17} color={colors.foregroundMuted} />
       </View>
-      <View style={{ minWidth: 0, flex: 1 }}>
+      <View style={inlineStyles.fill}>
         <Text
           style={{
             color: colors.foregroundSubtle,
@@ -72,7 +76,7 @@ function DetailRow({
           {value}
         </Text>
       </View>
-    </View>
+    </Inline>
   );
 }
 
@@ -140,17 +144,22 @@ export default function ProfileScreen() {
       >
         <Card style={{ width: stacked ? "100%" : 300 }}>
           <View
-            style={{
-              flexDirection: responsive.isMobile ? "row" : "column",
-              alignItems: "center",
-              gap: responsive.isMobile ? spacing.sm : 0,
-              paddingVertical: responsive.isMobile ? 0 : spacing.sm,
-            }}
+            style={[
+              responsive.isMobile ? inlineStyles.row : undefined,
+              {
+                flexDirection: responsive.isMobile ? "row" : "column",
+                alignItems: "center",
+                gap: responsive.isMobile ? spacing.sm : 0,
+                paddingVertical: responsive.isMobile ? 0 : spacing.sm,
+              },
+            ]}
           >
-            <UserAvatar
-              showStatus
-              size={responsive.isCompact ? 52 : responsive.isMobile ? 60 : 76}
-            />
+            <View style={inlineStyles.icon}>
+              <UserAvatar
+                showStatus
+                size={responsive.isCompact ? 52 : responsive.isMobile ? 60 : 76}
+              />
+            </View>
             <View
               style={{
                 minWidth: 0,

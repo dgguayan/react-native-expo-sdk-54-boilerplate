@@ -9,6 +9,7 @@ import {
   type ViewStyle,
 } from "react-native";
 
+import { InlineIconLabel, inlineStyles } from "@/components/ui/Inline";
 import { radii, spacing } from "@/constants/theme";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -76,6 +77,7 @@ export function Button({
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "row",
+          flexWrap: "nowrap",
           gap: spacing.xs,
           paddingHorizontal: spacing.md,
           paddingVertical: 10,
@@ -96,18 +98,29 @@ export function Button({
       ) : (
         <>
           {icon ? (
-            <Ionicons name={icon} size={18} color={palette.foreground} />
-          ) : null}
-          <Text
-            style={{
-              color: palette.foreground,
-              fontSize: 14,
-              fontWeight: "600",
-              lineHeight: 20,
-            }}
-          >
-            {title}
-          </Text>
+            <InlineIconLabel
+              color={palette.foreground}
+              icon={icon}
+              label={title}
+              labelStyle={{ fontSize: 14, fontWeight: "600", lineHeight: 20 }}
+            />
+          ) : (
+            <Text
+              ellipsizeMode="tail"
+              numberOfLines={1}
+              style={[
+                inlineStyles.label,
+                {
+                  color: palette.foreground,
+                  fontSize: 14,
+                  fontWeight: "600",
+                  lineHeight: 20,
+                },
+              ]}
+            >
+              {title}
+            </Text>
+          )}
         </>
       )}
     </Pressable>

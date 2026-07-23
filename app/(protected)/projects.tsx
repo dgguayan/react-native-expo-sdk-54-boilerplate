@@ -8,6 +8,7 @@ import { Screen } from "@/components/layout/Screen";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/Input";
+import { InlineIconLabel, inlineStyles } from "@/components/ui/Inline";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { radii, spacing } from "@/constants/theme";
@@ -116,16 +117,24 @@ export default function ProjectsScreen() {
               accessibilityLabel={`${project.name}, ${project.statusLabel}, ${project.progress}% complete`}
               style={{ width: cardWidth, minWidth: 0 }}
             >
-              <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: spacing.sm }}>
+              <View
+                style={[
+                  inlineStyles.row,
+                  { alignItems: "flex-start", gap: spacing.sm },
+                ]}
+              >
                 <View
-                  style={{
-                    width: responsive.isMobile ? 36 : 40,
-                    height: responsive.isMobile ? 36 : 40,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: radii.md,
-                    backgroundColor: colors.brandSoft,
-                  }}
+                  style={[
+                    inlineStyles.icon,
+                    {
+                      width: responsive.isMobile ? 36 : 40,
+                      height: responsive.isMobile ? 36 : 40,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: radii.md,
+                      backgroundColor: colors.brandSoft,
+                    },
+                  ]}
                 >
                   <Ionicons
                     name="folder-outline"
@@ -133,15 +142,35 @@ export default function ProjectsScreen() {
                     color={colors.brand}
                   />
                 </View>
-                <Badge label={project.statusLabel} tone={project.tone} />
+                <View style={inlineStyles.fill}>
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      color: colors.foregroundSubtle,
+                      fontSize: 11,
+                      fontWeight: "600",
+                      letterSpacing: 0.5,
+                    }}
+                  >
+                    {project.id}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      marginTop: 3,
+                      color: colors.foreground,
+                      fontSize: 16,
+                      fontWeight: "600",
+                    }}
+                  >
+                    {project.name}
+                  </Text>
+                </View>
+                <View style={inlineStyles.icon}>
+                  <Badge label={project.statusLabel} tone={project.tone} />
+                </View>
               </View>
-              <Text style={{ marginTop: responsive.isMobile ? spacing.sm : spacing.md, color: colors.foregroundSubtle, fontSize: 11, fontWeight: "600", letterSpacing: 0.5 }}>
-                {project.id}
-              </Text>
-              <Text style={{ marginTop: 4, color: colors.foreground, fontSize: 16, fontWeight: "600" }}>
-                {project.name}
-              </Text>
-              <Text style={{ minHeight: responsive.isMobile ? 0 : 40, marginTop: 5, color: colors.foregroundMuted, fontSize: 13, lineHeight: 19 }}>
+              <Text style={{ minHeight: responsive.isMobile ? 0 : 40, marginTop: responsive.isMobile ? spacing.sm : spacing.md, color: colors.foregroundMuted, fontSize: 13, lineHeight: 19 }}>
                 {project.summary}
               </Text>
 
@@ -176,10 +205,14 @@ export default function ProjectsScreen() {
                     </View>
                   ))}
                 </View>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                  <Ionicons name="calendar-outline" size={13} color={colors.foregroundMuted} />
-                  <Text style={{ color: colors.foregroundMuted, fontSize: 11 }}>{project.due}</Text>
-                </View>
+                <InlineIconLabel
+                  color={colors.foregroundMuted}
+                  gap={4}
+                  icon="calendar-outline"
+                  iconSize={13}
+                  label={project.due}
+                  labelStyle={{ fontSize: 11 }}
+                />
               </View>
             </Card>
           ))}

@@ -22,6 +22,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Inline, InlineIcon, inlineStyles } from "@/components/ui/Inline";
 import { profileNavigation, settingsNavigation } from "@/constants/navigation";
 import { radii, spacing, surfaceShadow } from "@/constants/theme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
@@ -36,6 +37,27 @@ const PROFILE_ITEM_ID = "account-menu-profile";
 const SETTINGS_ITEM_ID = "account-menu-settings";
 const LOGOUT_ITEM_ID = "account-menu-logout";
 const MENU_ITEM_IDS = [PROFILE_ITEM_ID, SETTINGS_ITEM_ID, LOGOUT_ITEM_ID];
+
+const accountMenuStyles = StyleSheet.create({
+  itemContent: {
+    width: "100%",
+    minWidth: 0,
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "center",
+  },
+  itemCopy: {
+    minWidth: 0,
+    flexBasis: 0,
+    flexGrow: 1,
+    flexShrink: 1,
+    justifyContent: "center",
+  },
+  itemFixed: {
+    flexGrow: 0,
+    flexShrink: 0,
+  },
+});
 
 interface AnchorRect {
   height: number;
@@ -88,10 +110,10 @@ function AccountMenuItem({
       onHoverOut={() => setHovered(false)}
       onPress={onPress}
       style={({ pressed }) => ({
-        minHeight: responsive.isCompact ? 48 : responsive.isMobile ? 50 : 52,
-        flexDirection: "row",
-        alignItems: "center",
-        gap: responsive.isCompact ? spacing.xs : spacing.sm,
+        width: "100%",
+        minHeight: responsive.isCompact ? 58 : 60,
+        alignItems: "stretch",
+        justifyContent: "center",
         borderWidth: 1,
         borderColor: focused ? colors.focusRing : "transparent",
         borderRadius: radii.md,
@@ -102,51 +124,74 @@ function AccountMenuItem({
               : colors.surfaceMuted
             : "transparent",
         paddingHorizontal: spacing.sm,
+        paddingVertical: spacing.xs,
         opacity: loading ? 0.55 : pressed ? 0.78 : 1,
         transform: [{ scale: pressed ? 0.988 : 1 }],
       })}
     >
-      <View
-        style={{
-          width: responsive.isCompact ? 30 : 32,
-          height: responsive.isCompact ? 30 : 32,
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: radii.sm,
-          backgroundColor: destructive ? colors.dangerSoft : colors.accent,
-        }}
-      >
-        {loading ? (
-          <ActivityIndicator color={colors.danger} size="small" />
-        ) : (
-          <Ionicons name={icon} size={18} color={foreground} />
-        )}
-      </View>
-      <View style={{ minWidth: 0, flex: 1 }}>
-        <Text
-          numberOfLines={1}
-          style={{ color: foreground, fontSize: 14, fontWeight: "600" }}
+      <View pointerEvents="none" style={accountMenuStyles.itemContent}>
+        <View
+          style={[
+            accountMenuStyles.itemFixed,
+            {
+              width: responsive.isCompact ? 32 : 34,
+              height: responsive.isCompact ? 32 : 34,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: radii.sm,
+              backgroundColor: destructive ? colors.dangerSoft : colors.accent,
+            },
+          ]}
         >
-          {loading ? "Logging out…" : label}
-        </Text>
-        <Text
-          numberOfLines={1}
-          style={{
-            marginTop: 2,
-            color: destructive ? colors.danger : colors.foregroundMuted,
-            fontSize: 11,
-          }}
+          {loading ? (
+            <ActivityIndicator color={colors.danger} size="small" />
+          ) : (
+            <Ionicons name={icon} size={18} color={foreground} />
+          )}
+        </View>
+
+        <View
+          style={[
+            accountMenuStyles.itemCopy,
+            { marginLeft: responsive.isCompact ? spacing.xs : spacing.sm },
+          ]}
         >
-          {description}
-        </Text>
-      </View>
-      {!loading && !destructive ? (
-        <Ionicons
+          <Text
+            ellipsizeMode="tail"
+            numberOfLines={1}
+            style={{ color: foreground, fontSize: 14, fontWeight: "600" }}
+          >
+            {loading ? "Logging out..." : label}
+          </Text>
+          <Text
+            ellipsizeMode="tail"
+            numberOfLines={1}
+            style={{
+              marginTop: 2,
+              color: destructive ? colors.danger : colors.foregroundMuted,
+              fontSize: 11,
+            }}
+          >
+            {description}
+          </Text>
+        </View>
+
+        <InlineIcon
+          color={destructive ? colors.danger : colors.foregroundSubtle}
           name="chevron-forward"
           size={15}
-          color={colors.foregroundSubtle}
+          style={[
+            accountMenuStyles.itemFixed,
+            {
+              width: 24,
+              height: 24,
+              alignItems: "center",
+              justifyContent: "center",
+              marginLeft: spacing.xs,
+            },
+          ]}
         />
-      ) : null}
+      </View>
     </Pressable>
   );
 }
@@ -180,7 +225,7 @@ function AccountMenuContent({
     <ScrollView
       accessibilityRole="menu"
       bounces={false}
-      contentContainerStyle={{ flexGrow: 0 }}
+      contentContainerStyle={{ width: "100%", flexGrow: 0 }}
       showsVerticalScrollIndicator={false}
     >
       {nativeSheet ? (
@@ -196,13 +241,14 @@ function AccountMenuContent({
             }}
           />
           <View
-            style={{
-              minHeight: responsive.isCompact ? 46 : 50,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              paddingHorizontal: spacing.md,
-            }}
+            style={[
+              inlineStyles.row,
+              {
+                minHeight: responsive.isCompact ? 46 : 50,
+                justifyContent: "space-between",
+                paddingHorizontal: spacing.md,
+              },
+            ]}
           >
             <Text
               accessibilityRole="header"
@@ -232,21 +278,25 @@ function AccountMenuContent({
       ) : null}
 
       <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: spacing.sm,
-          paddingHorizontal: responsive.isCompact ? spacing.sm : spacing.md,
-          paddingTop: nativeSheet
-            ? spacing.xs
-            : responsive.isCompact
-              ? spacing.sm
-              : spacing.md,
-          paddingBottom: responsive.isCompact ? spacing.sm : spacing.md,
-        }}
+        style={[
+          inlineStyles.row,
+          {
+            width: "100%",
+            gap: spacing.sm,
+            paddingHorizontal: responsive.isCompact ? spacing.sm : spacing.md,
+            paddingTop: nativeSheet
+              ? spacing.xs
+              : responsive.isCompact
+                ? spacing.sm
+                : spacing.md,
+            paddingBottom: responsive.isCompact ? spacing.sm : spacing.md,
+          },
+        ]}
       >
-        <UserAvatar showStatus size={responsive.isCompact ? 40 : 44} />
-        <View style={{ minWidth: 0, flex: 1 }}>
+        <View style={inlineStyles.icon}>
+          <UserAvatar showStatus size={responsive.isCompact ? 40 : 44} />
+        </View>
+        <View style={inlineStyles.fill}>
           <Text
             numberOfLines={1}
             style={{ color: colors.foreground, fontSize: 14, fontWeight: "700" }}
@@ -259,13 +309,9 @@ function AccountMenuContent({
           >
             {user?.email ?? "Signed in"}
           </Text>
-          <View
-            style={{
-              marginTop: 7,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-            }}
+          <Inline
+            gap={6}
+            style={{ marginTop: 7 }}
           >
             <View
               style={{
@@ -290,7 +336,7 @@ function AccountMenuContent({
             <Text style={{ color: colors.foregroundMuted, fontSize: 10 }}>
               Online
             </Text>
-          </View>
+          </Inline>
         </View>
       </View>
 
@@ -304,14 +350,14 @@ function AccountMenuContent({
 
       <View style={{ gap: 2, padding: spacing.xs }}>
         <AccountMenuItem
-          description="Personal details"
+          description="Personal Details"
           icon="person-outline"
           label="Profile"
           nativeID={PROFILE_ITEM_ID}
           onPress={onProfile}
         />
         <AccountMenuItem
-          description="Appearance and preferences"
+          description="Preferences & Configuration"
           icon="settings-outline"
           label="Settings"
           nativeID={SETTINGS_ITEM_ID}
@@ -327,9 +373,9 @@ function AccountMenuContent({
         />
         <AccountMenuItem
           destructive
-          description="End your current session"
+          description="Sign out of your account"
           icon="log-out-outline"
-          label="Log out"
+          label="Logout"
           loading={loggingOut}
           nativeID={LOGOUT_ITEM_ID}
           onPress={onLogout}
@@ -350,6 +396,99 @@ function AccountMenuContent({
         ) : null}
       </View>
     </ScrollView>
+  );
+}
+
+interface AccountTriggerContentProps {
+  avatarSize: number;
+  chevronColor: string;
+  collapsed: boolean;
+  displayName: string;
+  email: string;
+  expanded: boolean;
+  foregroundColor: string;
+  mutedColor: string;
+}
+
+function AccountTriggerContent({
+  avatarSize,
+  chevronColor,
+  collapsed,
+  displayName,
+  email,
+  expanded,
+  foregroundColor,
+  mutedColor,
+}: AccountTriggerContentProps) {
+  return (
+    <View
+      pointerEvents="none"
+      style={[
+        inlineStyles.row,
+        {
+          width: "100%",
+          justifyContent: collapsed ? "center" : "flex-start",
+        },
+      ]}
+    >
+      <View
+        style={{
+          width: avatarSize,
+          height: avatarSize,
+          flexGrow: 0,
+          flexShrink: 0,
+        }}
+      >
+        <UserAvatar showStatus size={avatarSize} />
+      </View>
+
+      {!collapsed ? (
+        <>
+          <View
+            style={{
+              minWidth: 0,
+              flex: 1,
+              justifyContent: "center",
+              marginLeft: spacing.sm,
+            }}
+          >
+            <Text
+              ellipsizeMode="tail"
+              numberOfLines={1}
+              style={{ color: foregroundColor, fontSize: 13, fontWeight: "600" }}
+            >
+              {displayName}
+            </Text>
+            <Text
+              ellipsizeMode="tail"
+              numberOfLines={1}
+              style={{ marginTop: 2, color: mutedColor, fontSize: 11 }}
+            >
+              {email}
+            </Text>
+          </View>
+
+          <View
+            accessible={false}
+            style={{
+              width: 24,
+              height: 24,
+              flexGrow: 0,
+              flexShrink: 0,
+              alignItems: "center",
+              justifyContent: "center",
+              marginLeft: spacing.xs,
+            }}
+          >
+            <Ionicons
+              color={chevronColor}
+              name={expanded ? "chevron-down" : "chevron-up"}
+              size={16}
+            />
+          </View>
+        </>
+      ) : null}
+    </View>
   );
 }
 
@@ -509,7 +648,7 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
     };
   }, [closeMenu, isWeb, mounted]);
 
-  const menuWidth = Math.min(292, width - spacing.xl);
+  const menuWidth = Math.min(Math.max(272, anchor?.width ?? 0), width - spacing.xl);
   const popoverPosition = useMemo(() => {
     const target = anchor ?? { x: spacing.sm, y: height, width: 0, height: 0 };
     return {
@@ -535,7 +674,11 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
 
   return (
     <>
-      <View collapsable={false} ref={triggerRef} style={{ position: "relative" }}>
+      <View
+        collapsable={false}
+        ref={triggerRef}
+        style={{ width: "100%", position: "relative" }}
+      >
         <Pressable
           accessibilityHint="Open profile, settings, and logout actions"
           accessibilityLabel="Open account menu"
@@ -548,6 +691,7 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
           onHoverOut={() => setHovered(false)}
           onPress={toggleMenu}
           style={({ pressed }) => ({
+            width: "100%",
             minHeight: collapsed
               ? 48
               : responsive.isCompact
@@ -555,10 +699,8 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
                 : responsive.isMobile
                   ? 54
                   : 58,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: collapsed ? "center" : "flex-start",
-            gap: spacing.sm,
+            alignItems: "stretch",
+            justifyContent: "center",
             borderWidth: 1,
             borderColor: focused ? colors.focusRing : "transparent",
             borderRadius: radii.md,
@@ -568,7 +710,11 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
                 : hovered || pressed
                   ? colors.surfaceMuted
                   : "transparent",
-            paddingHorizontal: collapsed ? 0 : spacing.xs,
+            paddingHorizontal: collapsed
+              ? 0
+              : responsive.isCompact
+                ? spacing.xs
+                : spacing.sm,
             opacity: pressed ? 0.78 : 1,
             transform: [{ scale: pressed ? 0.992 : 1 }],
           })}
@@ -585,33 +731,16 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
               }}
             />
           ) : null}
-          <UserAvatar
-            showStatus
-            size={collapsed ? 34 : responsive.isCompact ? 34 : 38}
+          <AccountTriggerContent
+            avatarSize={collapsed ? 34 : responsive.isCompact ? 34 : 38}
+            chevronColor={colors.foregroundSubtle}
+            collapsed={collapsed}
+            displayName={getUserDisplayName(user)}
+            email={user?.email ?? "Account"}
+            expanded={mounted}
+            foregroundColor={colors.foreground}
+            mutedColor={colors.foregroundMuted}
           />
-          {!collapsed ? (
-            <>
-              <View style={{ minWidth: 0, flex: 1 }}>
-                <Text
-                  numberOfLines={1}
-                  style={{ color: colors.foreground, fontSize: 13, fontWeight: "600" }}
-                >
-                  {getUserDisplayName(user)}
-                </Text>
-                <Text
-                  numberOfLines={1}
-                  style={{ marginTop: 2, color: colors.foregroundMuted, fontSize: 11 }}
-                >
-                  {user?.email ?? "Account"}
-                </Text>
-              </View>
-              <Ionicons
-                name={mounted ? "chevron-down" : "chevron-up"}
-                size={16}
-                color={colors.foregroundSubtle}
-              />
-            </>
-          ) : null}
         </Pressable>
 
         {collapsed && hovered && !mounted ? (

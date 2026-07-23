@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { usePathname, useRouter } from "expo-router";
 import { useState } from "react";
@@ -7,6 +6,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AccountMenu } from "@/components/account/AccountMenu";
 import { AppLogo } from "@/components/AppLogo";
+import {
+  InlineIcon,
+  InlineIconLabel,
+  inlineStyles,
+} from "@/components/ui/Inline";
 import { mainNavigation, type NavigationItem } from "@/constants/navigation";
 import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
@@ -43,27 +47,28 @@ function NavigationRow({
         onHoverIn={() => setHovered(true)}
         onHoverOut={() => setHovered(false)}
         onPress={onPress}
-        style={({ pressed }) => ({
-          minHeight: 44,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: collapsed ? "center" : "flex-start",
-          gap: responsive.isCompact ? spacing.xs : spacing.sm,
-          borderWidth: 1,
-          borderColor: focused ? colors.focusRing : "transparent",
-          borderRadius: radii.md,
-          backgroundColor: isActive
-            ? colors.accent
-            : hovered || pressed
-              ? colors.surfaceMuted
-              : "transparent",
-          paddingHorizontal: collapsed
-            ? 0
-            : responsive.isCompact
-              ? spacing.xs
-              : spacing.sm,
-          opacity: pressed ? 0.72 : 1,
-        })}
+        style={({ pressed }) => [
+          inlineStyles.row,
+          {
+            minHeight: 44,
+            justifyContent: collapsed ? "center" : "flex-start",
+            gap: responsive.isCompact ? spacing.xs : spacing.sm,
+            borderWidth: 1,
+            borderColor: focused ? colors.focusRing : "transparent",
+            borderRadius: radii.md,
+            backgroundColor: isActive
+              ? colors.accent
+              : hovered || pressed
+                ? colors.surfaceMuted
+                : "transparent",
+            paddingHorizontal: collapsed
+              ? 0
+              : responsive.isCompact
+                ? spacing.xs
+                : spacing.sm,
+            opacity: pressed ? 0.72 : 1,
+          },
+        ]}
       >
         {isActive ? (
           <View
@@ -77,24 +82,26 @@ function NavigationRow({
             }}
           />
         ) : null}
-        <Ionicons
-          name={item.icon}
-          size={responsive.isCompact ? 19 : 20}
-          color={isActive ? colors.foreground : colors.foregroundMuted}
-        />
-        {!collapsed ? (
-          <Text
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              color: isActive ? colors.foreground : colors.foregroundMuted,
+        {collapsed ? (
+          <InlineIcon
+            color={isActive ? colors.foreground : colors.foregroundMuted}
+            name={item.icon}
+            size={responsive.isCompact ? 19 : 20}
+          />
+        ) : (
+          <InlineIconLabel
+            color={isActive ? colors.foreground : colors.foregroundMuted}
+            fill
+            gap={responsive.isCompact ? spacing.xs : spacing.sm}
+            icon={item.icon}
+            iconSize={responsive.isCompact ? 19 : 20}
+            label={item.label}
+            labelStyle={{
               fontSize: responsive.isCompact ? 13 : 14,
               fontWeight: isActive ? "600" : "500",
             }}
-          >
-            {item.label}
-          </Text>
-        ) : null}
+          />
+        )}
       </Pressable>
 
       {collapsed && hovered ? (
@@ -207,7 +214,8 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
         style={{
           borderTopWidth: 1,
           borderTopColor: colors.border,
-          padding: responsive.isCompact ? spacing.xs : spacing.sm,
+          paddingHorizontal: spacing.sm,
+          paddingVertical: responsive.isCompact ? spacing.xs : spacing.sm,
         }}
       >
         <AccountMenu

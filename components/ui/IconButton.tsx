@@ -36,6 +36,8 @@ export function IconButton({
       style={({ pressed }) => ({
         width: 40,
         height: 40,
+        flexGrow: 0,
+        flexShrink: 0,
         alignItems: "center",
         justifyContent: "center",
         borderRadius: radii.md,

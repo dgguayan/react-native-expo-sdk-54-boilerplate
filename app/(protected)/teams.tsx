@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Text, View } from "react-native";
 
@@ -6,6 +5,7 @@ import { StateView } from "@/components/feedback/StateView";
 import { Screen } from "@/components/layout/Screen";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { InlineIconLabel, inlineStyles } from "@/components/ui/Inline";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
@@ -35,7 +35,7 @@ export default function TeamsScreen() {
   const [activeTab, setActiveTab] = useState<TeamTab>("members");
   const showEmail = responsive.contentWidth >= 700;
   const roleWidth = responsive.isCompact
-    ? 72
+    ? 80
     : responsive.isMobile
       ? 80
       : 92;
@@ -107,8 +107,13 @@ export default function TeamsScreen() {
                 paddingHorizontal: rowPadding,
               }}
             >
-              <View style={{ flex: 1.4, minWidth: 0, flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
-                <View style={{ position: "relative" }}>
+              <View
+                style={[
+                  inlineStyles.row,
+                  { minWidth: 0, flex: 1.4, gap: spacing.sm },
+                ]}
+              >
+                <View style={[inlineStyles.icon, { position: "relative" }]}>
                   <View
                     style={{
                       width: responsive.isCompact ? 34 : 38,
@@ -137,7 +142,7 @@ export default function TeamsScreen() {
                     }}
                   />
                 </View>
-                <View style={{ minWidth: 0, flex: 1 }}>
+                <View style={inlineStyles.fill}>
                   <Text numberOfLines={1} style={{ color: colors.foreground, fontSize: 14, fontWeight: "600" }}>
                     {member.name}
                   </Text>
@@ -153,14 +158,16 @@ export default function TeamsScreen() {
                   {member.email}
                 </Text>
               ) : null}
-              <View style={{ width: roleWidth, flexDirection: "row", alignItems: "center", gap: 5 }}>
-                {!responsive.isCompact ? (
-                  <Ionicons name="shield-checkmark-outline" size={14} color={colors.foregroundMuted} />
-                ) : null}
-                <Text numberOfLines={1} style={{ color: colors.foregroundMuted, fontSize: 12 }}>
-                  {member.role}
-                </Text>
-              </View>
+              <InlineIconLabel
+                color={colors.foregroundMuted}
+                containerStyle={{ width: roleWidth }}
+                fill
+                gap={responsive.isCompact ? 3 : 5}
+                icon="shield-checkmark-outline"
+                iconSize={responsive.isCompact ? 12 : 14}
+                label={member.role}
+                labelStyle={{ fontSize: 12 }}
+              />
             </View>
           ))}
         </Card>

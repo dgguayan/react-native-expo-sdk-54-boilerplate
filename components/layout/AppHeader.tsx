@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { UserAvatar } from "@/components/account/UserAvatar";
 import { IconButton } from "@/components/ui/IconButton";
+import { inlineStyles } from "@/components/ui/Inline";
 import { layout, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
@@ -25,33 +26,32 @@ export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
     >
       <View
         accessibilityRole="toolbar"
-        style={{
-          minHeight: responsive.isCompact
-            ? 56
-            : responsive.isMobile
-              ? 60
-              : layout.headerHeight,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: responsive.isCompact ? spacing.xs : spacing.md,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
-          paddingHorizontal: isDesktop
-            ? spacing.xl
-            : responsive.isCompact
-              ? spacing.xs
-              : spacing.md,
-        }}
+        style={[
+          inlineStyles.row,
+          {
+            minHeight: responsive.isCompact
+              ? 56
+              : responsive.isMobile
+                ? 60
+                : layout.headerHeight,
+            justifyContent: "space-between",
+            gap: responsive.isCompact ? spacing.xs : spacing.md,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.border,
+            paddingHorizontal: isDesktop
+              ? spacing.xl
+              : responsive.isCompact
+                ? spacing.xs
+                : spacing.md,
+          },
+        ]}
       >
         <View
-          style={{
-            minWidth: 0,
-            flex: 1,
-            flexDirection: "row",
-            alignItems: "center",
-            gap: responsive.isCompact ? spacing.xs : spacing.sm,
-          }}
+          style={[
+            inlineStyles.row,
+            inlineStyles.fill,
+            { gap: responsive.isCompact ? spacing.xs : spacing.sm },
+          ]}
         >
           <IconButton
             icon={
@@ -83,11 +83,11 @@ export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
         </View>
 
         <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: responsive.isCompact ? spacing.xxs : spacing.xs,
-          }}
+          style={[
+            inlineStyles.row,
+            inlineStyles.icon,
+            { gap: responsive.isCompact ? spacing.xxs : spacing.xs },
+          ]}
         >
           <IconButton
             icon={resolvedTheme === "dark" ? "sunny-outline" : "moon-outline"}

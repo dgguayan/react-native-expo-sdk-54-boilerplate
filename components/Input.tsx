@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 
+import { InlineIcon, inlineStyles } from "@/components/ui/Inline";
 import { radii, spacing } from "@/constants/theme";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -47,27 +48,28 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
       ) : null}
 
       <View
-        style={{
-          minHeight: 46,
-          flexDirection: "row",
-          alignItems: "center",
-          gap: spacing.sm,
-          borderWidth: 1,
-          borderColor: error
-            ? colors.danger
-            : focused
-              ? colors.focusRing
-              : colors.borderStrong,
-          borderRadius: radii.md,
-          backgroundColor: colors.input,
-          paddingHorizontal: spacing.sm,
-        }}
+        style={[
+          inlineStyles.row,
+          {
+            minHeight: 46,
+            gap: spacing.sm,
+            borderWidth: 1,
+            borderColor: error
+              ? colors.danger
+              : focused
+                ? colors.focusRing
+                : colors.borderStrong,
+            borderRadius: radii.md,
+            backgroundColor: colors.input,
+            paddingHorizontal: spacing.sm,
+          },
+        ]}
       >
         {icon ? (
-          <Ionicons
+          <InlineIcon
+            color={focused ? colors.foreground : colors.foregroundMuted}
             name={icon}
             size={18}
-            color={focused ? colors.foreground : colors.foregroundMuted}
           />
         ) : null}
         <TextInput
@@ -89,6 +91,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
             {
               flex: 1,
               minWidth: 0,
+              flexShrink: 1,
               paddingVertical: 11,
               color: colors.foreground,
               fontSize: 15,

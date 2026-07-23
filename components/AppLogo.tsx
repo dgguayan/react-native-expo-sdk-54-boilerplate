@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
 
+import { Inline, inlineStyles } from "@/components/ui/Inline";
 import { radii, spacing } from "@/constants/theme";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -19,27 +20,32 @@ export function AppLogo({ compact = false, inverse = false }: AppLogoProps) {
     : colors.foregroundMuted;
 
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
+    <Inline gap={spacing.sm}>
       <View
-        style={{
-          width: 36,
-          height: 36,
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: radii.md,
-          backgroundColor: markBackground,
-        }}
+        style={[
+          inlineStyles.icon,
+          {
+            width: 36,
+            height: 36,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: radii.md,
+            backgroundColor: markBackground,
+          },
+        ]}
       >
         <Ionicons name="layers-outline" size={20} color={markForeground} />
       </View>
       {!compact ? (
-        <View>
+        <View style={inlineStyles.content}>
           <Text
+            numberOfLines={1}
             style={{ color: titleColor, fontSize: 15, fontWeight: "700" }}
           >
             Workspace
           </Text>
           <Text
+            numberOfLines={1}
             style={{
               marginTop: 1,
               color: subtitleColor,
@@ -51,6 +57,6 @@ export function AppLogo({ compact = false, inverse = false }: AppLogoProps) {
           </Text>
         </View>
       ) : null}
-    </View>
+    </Inline>
   );
 }
