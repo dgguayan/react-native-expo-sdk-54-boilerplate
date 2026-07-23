@@ -702,19 +702,27 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
             alignItems: "stretch",
             justifyContent: "center",
             borderWidth: 1,
-            borderColor: focused ? colors.focusRing : "transparent",
-            borderRadius: radii.md,
+            borderColor: focused
+              ? colors.focusRing
+              : accountRouteActive
+                ? colors.brand
+                : "transparent",
+            borderRadius: radii.lg,
             backgroundColor:
-              mounted || accountRouteActive
-                ? colors.accent
-                : hovered || pressed
-                  ? colors.surfaceMuted
-                  : "transparent",
+              accountRouteActive
+                ? colors.brandSoft
+                : mounted
+                  ? colors.accent
+                  : hovered || pressed
+                    ? colors.surfaceMuted
+                    : "transparent",
             paddingHorizontal: collapsed
               ? 0
               : responsive.isCompact
-                ? spacing.xs
-                : spacing.sm,
+                ? spacing.sm
+                : responsive.isPhone
+                  ? spacing.md
+                  : spacing.sm,
             opacity: pressed ? 0.78 : 1,
             transform: [{ scale: pressed ? 0.992 : 1 }],
           })}
@@ -724,21 +732,21 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
               style={{
                 position: "absolute",
                 left: collapsed ? -7 : -9,
-                width: 3,
-                height: 24,
+                width: 4,
+                height: 26,
                 borderRadius: 2,
-                backgroundColor: colors.foreground,
+                backgroundColor: colors.brand,
               }}
             />
           ) : null}
           <AccountTriggerContent
             avatarSize={collapsed ? 34 : responsive.isCompact ? 34 : 38}
-            chevronColor={colors.foregroundSubtle}
+            chevronColor={accountRouteActive ? colors.brand : colors.foregroundSubtle}
             collapsed={collapsed}
             displayName={getUserDisplayName(user)}
             email={user?.email ?? "Account"}
             expanded={mounted}
-            foregroundColor={colors.foreground}
+            foregroundColor={accountRouteActive ? colors.brand : colors.foreground}
             mutedColor={colors.foregroundMuted}
           />
         </Pressable>

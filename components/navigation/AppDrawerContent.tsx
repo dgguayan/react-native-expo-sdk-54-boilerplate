@@ -1,7 +1,14 @@
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { usePathname, useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+  type ViewStyle,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AccountMenu } from "@/components/account/AccountMenu";
@@ -16,6 +23,21 @@ import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
+
+type InteractiveViewStyle = ViewStyle & {
+  transitionDuration?: string;
+  transitionProperty?: string;
+  transitionTimingFunction?: string;
+};
+
+const webInteractionStyle: InteractiveViewStyle | undefined =
+  Platform.OS === "web"
+    ? {
+        transitionDuration: "160ms",
+        transitionProperty: "background-color, border-color, opacity, transform",
+        transitionTimingFunction: "ease-out",
+      }
+    : undefined;
 
 interface NavigationRowProps {
   collapsed: boolean;
@@ -34,6 +56,7 @@ function NavigationRow({
   const responsive = useResponsiveLayout();
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
+  const foreground = isActive ? colors.brand : colors.foregroundMuted;
 
   return (
     <View style={{ position: "relative" }}>
@@ -50,23 +73,37 @@ function NavigationRow({
         style={({ pressed }) => [
           inlineStyles.row,
           {
-            minHeight: 44,
+            minHeight: responsive.isCompact
+              ? 52
+              : responsive.isMobile
+                ? 54
+                : 48,
             justifyContent: collapsed ? "center" : "flex-start",
-            gap: responsive.isCompact ? spacing.xs : spacing.sm,
+            gap: spacing.sm,
             borderWidth: 1,
-            borderColor: focused ? colors.focusRing : "transparent",
-            borderRadius: radii.md,
+            borderColor: focused
+              ? colors.focusRing
+              : isActive
+                ? colors.brand
+                : hovered
+                  ? colors.borderStrong
+                  : "transparent",
+            borderRadius: radii.lg,
             backgroundColor: isActive
-              ? colors.accent
+              ? colors.brandSoft
               : hovered || pressed
                 ? colors.surfaceMuted
                 : "transparent",
             paddingHorizontal: collapsed
               ? 0
               : responsive.isCompact
-                ? spacing.xs
-                : spacing.sm,
-            opacity: pressed ? 0.72 : 1,
+                ? spacing.sm
+                : responsive.isPhone
+                  ? spacing.md
+                  : spacing.sm,
+            opacity: pressed ? 0.76 : 1,
+            transform: [{ scale: pressed ? 0.992 : 1 }],
+            ...webInteractionStyle,
           },
         ]}
       >
@@ -75,29 +112,25 @@ function NavigationRow({
             style={{
               position: "absolute",
               left: collapsed ? -7 : -9,
-              width: 3,
-              height: 22,
+              width: 4,
+              height: responsive.isMobile ? 26 : 24,
               borderRadius: 2,
-              backgroundColor: colors.foreground,
+              backgroundColor: colors.brand,
             }}
           />
         ) : null}
         {collapsed ? (
-          <InlineIcon
-            color={isActive ? colors.foreground : colors.foregroundMuted}
-            name={item.icon}
-            size={responsive.isCompact ? 19 : 20}
-          />
+          <InlineIcon color={foreground} name={item.icon} size={20} />
         ) : (
           <InlineIconLabel
-            color={isActive ? colors.foreground : colors.foregroundMuted}
+            color={foreground}
             fill
-            gap={responsive.isCompact ? spacing.xs : spacing.sm}
+            gap={spacing.sm}
             icon={item.icon}
-            iconSize={responsive.isCompact ? 19 : 20}
+            iconSize={20}
             label={item.label}
             labelStyle={{
-              fontSize: responsive.isCompact ? 13 : 14,
+              fontSize: 14,
               fontWeight: isActive ? "600" : "500",
             }}
           />
@@ -140,6 +173,8 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
   const { desktopCollapsed, isDesktop } = useAppShell();
   const responsive = useResponsiveLayout();
   const collapsed = isDesktop && desktopCollapsed;
+  const sidebarHorizontalPadding =
+    responsive.isPhone && !responsive.isCompact ? spacing.md : spacing.sm;
 
   const navigate = (item: NavigationItem) => {
     router.navigate(item.href);
@@ -174,21 +209,18 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
 
       <ScrollView
         contentContainerStyle={{
-          gap: spacing.xxs,
-          paddingHorizontal: spacing.sm,
-          paddingVertical: responsive.isCompact
-            ? spacing.sm
-            : responsive.isMobile
-              ? spacing.md
-              : spacing.lg,
+          gap: spacing.xs,
+          paddingHorizontal: sidebarHorizontalPadding,
+          paddingVertical: responsive.isMobile ? spacing.md : spacing.lg,
         }}
         showsVerticalScrollIndicator={false}
       >
         {!collapsed ? (
           <Text
             style={{
-              marginBottom: spacing.xs,
-              paddingHorizontal: spacing.sm,
+              marginBottom: spacing.sm,
+              paddingHorizontal:
+                responsive.isPhone && !responsive.isCompact ? spacing.md : spacing.sm,
               color: colors.foregroundSubtle,
               fontSize: 11,
               fontWeight: "600",
@@ -214,7 +246,7 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
         style={{
           borderTopWidth: 1,
           borderTopColor: colors.border,
-          paddingHorizontal: spacing.sm,
+          paddingHorizontal: sidebarHorizontalPadding,
           paddingVertical: responsive.isCompact ? spacing.xs : spacing.sm,
         }}
       >

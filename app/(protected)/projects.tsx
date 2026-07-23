@@ -93,6 +93,7 @@ export default function ProjectsScreen() {
           onChange={setFilter}
           options={filters}
           value={filter}
+          variant="status"
         />
       </View>
 
