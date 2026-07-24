@@ -15,7 +15,8 @@ import {
   useWindowDimensions,
 } from "react-native";
 
-import { layout, spacing } from "@/constants/theme";
+import { layout } from "@/constants/theme";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 const SIDEBAR_STORAGE_KEY = "desktop-sidebar-collapsed";
 
@@ -42,6 +43,7 @@ if (
 
 export function AppShellProvider({ children }: PropsWithChildren) {
   const { width } = useWindowDimensions();
+  const { tokens } = useAppTheme();
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
 
   const breakpoint: AppBreakpoint =
@@ -80,7 +82,9 @@ export function AppShellProvider({ children }: PropsWithChildren) {
   }, []);
 
   const drawerGutter =
-    width < layout.compactBreakpoint ? spacing.md : spacing.xl;
+    width < layout.compactBreakpoint
+      ? tokens.spacing.md
+      : tokens.spacing.xl;
   const drawerWidth =
     breakpoint === "desktop"
       ? desktopCollapsed

@@ -9,10 +9,10 @@ import { Screen } from "@/components/layout/Screen";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Inline, inlineStyles } from "@/components/ui/Inline";
-import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
-import { getUserDisplayName, getUserRole } from "@/lib/user-profile";
+import { getRoleLabel } from "@/lib/authorization";
+import { getUserDisplayName } from "@/lib/user-profile";
 import { useAuth } from "@/providers/AuthProvider";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -37,7 +37,8 @@ function DetailRow({
   label: string;
   value: string;
 }) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
+  const { radii, spacing } = tokens;
   const responsive = useResponsiveLayout();
 
   return (
@@ -81,8 +82,9 @@ function DetailRow({
 }
 
 export default function ProfileScreen() {
-  const { colors } = useAppTheme();
-  const { updateProfile, user } = useAuth();
+  const { colors, tokens } = useAppTheme();
+  const { spacing } = tokens;
+  const { primaryRole, updateProfile, user } = useAuth();
   const { drawerWidth, isDesktop } = useAppShell();
   const responsive = useResponsiveLayout(isDesktop ? drawerWidth : 0);
   const [fullName, setFullName] = useState(() => getUserDisplayName(user));
@@ -186,14 +188,14 @@ export default function ProfileScreen() {
                 {user?.email ?? "Email unavailable"}
               </Text>
               <View style={{ marginTop: responsive.isCompact ? spacing.xs : spacing.sm }}>
-                <Badge label={getUserRole(user)} tone="brand" />
+                <Badge label={getRoleLabel(primaryRole)} tone="brand" />
               </View>
             </View>
           </View>
 
           <View
             style={{
-              height: 1,
+              height: tokens.borders.thin,
               marginVertical: responsive.isMobile ? spacing.md : spacing.lg,
               backgroundColor: colors.border,
             }}

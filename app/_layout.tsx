@@ -1,7 +1,9 @@
 import "../global.css";
 
+import * as SplashScreen from "expo-splash-screen";
 import { Stack, type ErrorBoundaryProps } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { Pressable, Text } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
@@ -16,10 +18,19 @@ import { AppThemeProvider, useAppTheme } from "@/providers/ThemeProvider";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 
+SplashScreen.preventAutoHideAsync().catch(() => undefined);
+
 function RootNavigator() {
   const { loading, session } = useAuth();
-  const { resolvedTheme } = useAppTheme();
+  const { isReady: themeReady, resolvedTheme } = useAppTheme();
 
+  useEffect(() => {
+    if (themeReady) {
+      SplashScreen.hideAsync().catch(() => undefined);
+    }
+  }, [themeReady]);
+
+  if (!themeReady) return null;
   if (loading) return <AppLoadingScreen />;
 
   return (

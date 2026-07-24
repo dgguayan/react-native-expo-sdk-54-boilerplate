@@ -1,6 +1,5 @@
 import { View } from "react-native";
 
-import { radii } from "@/constants/theme";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface ProgressBarProps {
@@ -9,7 +8,7 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ color, value }: ProgressBarProps) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const normalizedValue = Math.min(100, Math.max(0, value));
 
   return (
@@ -19,7 +18,7 @@ export function ProgressBar({ color, value }: ProgressBarProps) {
       style={{
         height: 7,
         overflow: "hidden",
-        borderRadius: radii.full,
+        borderRadius: tokens.radii.full,
         backgroundColor: colors.accent,
       }}
     >
@@ -27,7 +26,7 @@ export function ProgressBar({ color, value }: ProgressBarProps) {
         style={{
           width: `${normalizedValue}%`,
           height: "100%",
-          borderRadius: radii.full,
+          borderRadius: tokens.radii.full,
           backgroundColor: color ?? colors.brand,
         }}
       />

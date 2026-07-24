@@ -19,7 +19,6 @@ import {
   inlineStyles,
 } from "@/components/ui/Inline";
 import { mainNavigation, type NavigationItem } from "@/constants/navigation";
-import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
@@ -52,11 +51,13 @@ function NavigationRow({
   item,
   onPress,
 }: NavigationRowProps) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const responsive = useResponsiveLayout();
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
-  const foreground = isActive ? colors.brand : colors.foregroundMuted;
+  const foreground = isActive
+    ? colors.sidebarActiveForeground
+    : colors.sidebarMuted;
 
   return (
     <View style={{ position: "relative" }}>
@@ -79,28 +80,28 @@ function NavigationRow({
                 ? 54
                 : 48,
             justifyContent: collapsed ? "center" : "flex-start",
-            gap: spacing.sm,
-            borderWidth: 1,
+            gap: tokens.spacing.sm,
+            borderWidth: tokens.borders.thin,
             borderColor: focused
               ? colors.focusRing
               : isActive
-                ? colors.brand
+                ? colors.sidebarActiveForeground
                 : hovered
-                  ? colors.borderStrong
+                  ? colors.sidebarBorder
                   : "transparent",
-            borderRadius: radii.lg,
+            borderRadius: tokens.radii.lg,
             backgroundColor: isActive
-              ? colors.brandSoft
+              ? colors.sidebarActive
               : hovered || pressed
-                ? colors.surfaceMuted
+                ? colors.accent
                 : "transparent",
             paddingHorizontal: collapsed
               ? 0
               : responsive.isCompact
-                ? spacing.sm
+                ? tokens.spacing.sm
                 : responsive.isPhone
-                  ? spacing.md
-                  : spacing.sm,
+                  ? tokens.spacing.md
+                  : tokens.spacing.sm,
             opacity: pressed ? 0.76 : 1,
             transform: [{ scale: pressed ? 0.992 : 1 }],
             ...webInteractionStyle,
@@ -115,7 +116,7 @@ function NavigationRow({
               width: 4,
               height: responsive.isMobile ? 26 : 24,
               borderRadius: 2,
-              backgroundColor: colors.brand,
+              backgroundColor: colors.sidebarActiveForeground,
             }}
           />
         ) : null}
@@ -125,7 +126,7 @@ function NavigationRow({
           <InlineIconLabel
             color={foreground}
             fill
-            gap={spacing.sm}
+            gap={tokens.spacing.sm}
             icon={item.icon}
             iconSize={20}
             label={item.label}
@@ -139,16 +140,16 @@ function NavigationRow({
 
       {collapsed && hovered ? (
         <View
-          pointerEvents="none"
           style={{
             position: "absolute",
             left: 58,
             top: 7,
             zIndex: 100,
-            borderRadius: radii.sm,
+            borderRadius: tokens.radii.sm,
             backgroundColor: colors.primary,
-            paddingHorizontal: spacing.sm,
+            paddingHorizontal: tokens.spacing.sm,
             paddingVertical: 6,
+            pointerEvents: "none",
           }}
         >
           <Text
@@ -169,12 +170,14 @@ function NavigationRow({
 export function AppDrawerContent(props: DrawerContentComponentProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const { desktopCollapsed, isDesktop } = useAppShell();
   const responsive = useResponsiveLayout();
   const collapsed = isDesktop && desktopCollapsed;
   const sidebarHorizontalPadding =
-    responsive.isPhone && !responsive.isCompact ? spacing.md : spacing.sm;
+    responsive.isPhone && !responsive.isCompact
+      ? tokens.spacing.md
+      : tokens.spacing.sm;
 
   const navigate = (item: NavigationItem) => {
     router.navigate(item.href);
@@ -187,7 +190,11 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
   return (
     <SafeAreaView
       edges={["top", "bottom"]}
-      style={{ flex: 1, overflow: "visible", backgroundColor: colors.surface }}
+      style={{
+        flex: 1,
+        overflow: "visible",
+        backgroundColor: colors.sidebar,
+      }}
     >
       <View
         style={{
@@ -195,13 +202,13 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: collapsed ? "center" : "flex-start",
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
+          borderBottomWidth: tokens.borders.thin,
+          borderBottomColor: colors.sidebarBorder,
           paddingHorizontal: collapsed
-            ? spacing.sm
+            ? tokens.spacing.sm
             : responsive.isCompact
-              ? spacing.sm
-              : spacing.md,
+              ? tokens.spacing.sm
+              : tokens.spacing.md,
         }}
       >
         <AppLogo compact={collapsed} />
@@ -209,19 +216,23 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
 
       <ScrollView
         contentContainerStyle={{
-          gap: spacing.xs,
+          gap: tokens.spacing.xs,
           paddingHorizontal: sidebarHorizontalPadding,
-          paddingVertical: responsive.isMobile ? spacing.md : spacing.lg,
+          paddingVertical: responsive.isMobile
+            ? tokens.spacing.md
+            : tokens.spacing.lg,
         }}
         showsVerticalScrollIndicator={false}
       >
         {!collapsed ? (
           <Text
             style={{
-              marginBottom: spacing.sm,
+              marginBottom: tokens.spacing.sm,
               paddingHorizontal:
-                responsive.isPhone && !responsive.isCompact ? spacing.md : spacing.sm,
-              color: colors.foregroundSubtle,
+                responsive.isPhone && !responsive.isCompact
+                  ? tokens.spacing.md
+                  : tokens.spacing.sm,
+              color: colors.sidebarMuted,
               fontSize: 11,
               fontWeight: "600",
               letterSpacing: 0.8,
@@ -244,10 +255,12 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
 
       <View
         style={{
-          borderTopWidth: 1,
-          borderTopColor: colors.border,
+          borderTopWidth: tokens.borders.thin,
+          borderTopColor: colors.sidebarBorder,
           paddingHorizontal: sidebarHorizontalPadding,
-          paddingVertical: responsive.isCompact ? spacing.xs : spacing.sm,
+          paddingVertical: responsive.isCompact
+            ? tokens.spacing.xs
+            : tokens.spacing.sm,
         }}
       >
         <AccountMenu

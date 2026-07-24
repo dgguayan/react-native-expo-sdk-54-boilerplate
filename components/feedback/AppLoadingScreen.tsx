@@ -1,14 +1,21 @@
 import { useEffect, useRef } from "react";
-import { Animated, View, type DimensionValue } from "react-native";
+import {
+  Animated,
+  Platform,
+  View,
+  type DimensionValue,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppLogo } from "@/components/AppLogo";
-import { radii, spacing } from "@/constants/theme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
+const supportsNativeAnimatedDriver = Platform.OS !== "web";
+
 export function AppLoadingScreen() {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
+  const { radii, spacing } = tokens;
   const responsive = useResponsiveLayout();
   const opacity = useRef(new Animated.Value(0.45)).current;
 
@@ -18,12 +25,12 @@ export function AppLoadingScreen() {
         Animated.timing(opacity, {
           toValue: 0.9,
           duration: 650,
-          useNativeDriver: true,
+          useNativeDriver: supportsNativeAnimatedDriver,
         }),
         Animated.timing(opacity, {
           toValue: 0.45,
           duration: 650,
-          useNativeDriver: true,
+          useNativeDriver: supportsNativeAnimatedDriver,
         }),
       ]),
     );

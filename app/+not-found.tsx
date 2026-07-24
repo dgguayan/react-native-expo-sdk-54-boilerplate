@@ -3,12 +3,12 @@ import { Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "@/components/Button";
-import { spacing } from "@/constants/theme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function NotFoundScreen() {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
+  const { spacing } = tokens;
   const responsive = useResponsiveLayout();
 
   return (

@@ -15,7 +15,7 @@ type WebTransitionStyle = ViewStyle & {
 };
 
 function ProtectedNavigator() {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const { drawerWidth, isDesktop, toggleDesktopSidebar } = useAppShell();
   const webTransition: WebTransitionStyle | undefined =
     Platform.OS === "web"
@@ -43,9 +43,9 @@ function ProtectedNavigator() {
             {
               width: drawerWidth,
               overflow: "visible",
-              borderRightColor: colors.border,
-              borderRightWidth: 1,
-              backgroundColor: colors.surface,
+              borderRightColor: colors.sidebarBorder,
+              borderRightWidth: tokens.borders.thin,
+              backgroundColor: colors.sidebar,
             },
             webTransition,
           ],

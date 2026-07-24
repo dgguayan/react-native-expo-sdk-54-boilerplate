@@ -43,16 +43,23 @@ components/
   navigation/                 Custom drawer content
   ui/                         Reusable inline, card, badge, progress, and control primitives
 constants/
+  authorization.ts            Typed system-role and permission identifiers
   navigation.ts               Typed application route registry
-  theme.ts                    Color, spacing, radius, typography, and layout tokens
+  theme.ts                    Typed theme contracts and default design tokens
+  theme-presets.ts            Data-only light/dark application preset registry
 context/
   AppShellContext.tsx         Responsive breakpoint and sidebar state
 hooks/                        Platform-aware color and responsive-layout hooks
 lib/
+  authorization.ts            Validated authorization RPC and reusable helpers
   supabase.ts                 Universal Supabase client and session storage
+  theme-settings.ts           Theme cache, database, and realtime synchronization
 providers/
   AuthProvider.tsx            Authentication state and profile actions
-  ThemeProvider.tsx           System/light/dark preference and navigation theme
+  ThemeProvider.tsx           Presets, display mode, CSS vars, and navigation theme
+supabase/migrations/          Versioned settings, RBAC schema, triggers, and RLS
+docs/rbac.md                  RBAC model, bootstrap, and extension guide
+docs/theming.md               Theme extension and operations guide
 types/                        Shared TypeScript contracts
 ```
 
@@ -68,9 +75,18 @@ Authentication is client-side on static web exports. Sensitive authorization mus
 
 ## Theme and UI state
 
-The theme provider supports system, light, and dark modes. The selected mode, desktop sidebar state, and device notification preferences persist in AsyncStorage.
+The application ships with Default, Modern, Corporate, and Minimal presets,
+each with complete light and dark palettes. Administrators select the shared
+preset in Settings; it is stored in the Supabase `app_settings` table and
+propagated to active clients over Realtime. Every device independently supports
+System, Light, and Dark display modes with an AsyncStorage preference.
 
-The design token layer intentionally uses React Native styles for dynamic colors, focus states, responsive dimensions, and cross-platform shadows. Shared responsive metrics calculate page padding, card density, typography, and usable content width for compact phones, phones, tablets, and desktop. NativeWind remains configured for static utility styling when it is the clearest option.
+The provider restores a validated cached preset before revealing application
+content, reconciles it with the database, and supplies the same semantic tokens
+to React Native components, React Navigation, and web CSS variables. Shared
+responsive metrics consume the active spacing scale. See
+[the theme architecture guide](docs/theming.md) for the token contract,
+database policy, preset workflow, and future tenant/custom-theme path.
 
 ## Environment
 
@@ -82,6 +98,17 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 Never place a Supabase service-role key or another server secret in an `EXPO_PUBLIC_` variable. Configure Supabase Auth redirect URLs for each web domain and native scheme before release.
+
+Apply the included Supabase migration before using administrator theme changes:
+
+```bash
+supabase db push
+```
+
+The RBAC migration seeds Admin, Manager, Staff, and User roles. Theme writes
+require a normalized Admin assignment; the database RLS policy—not the client
+UI—is the authorization boundary. See [the RBAC guide](docs/rbac.md), including
+the deterministic current-account bootstrap behavior for existing projects.
 
 ## Commands
 
@@ -108,8 +135,13 @@ Native release builds should use EAS Build or local native tooling supported by 
 - Expo Router remains the source of truth because it supplies nested native navigation, typed routes, browser URLs, static web output, and deep links from one filesystem hierarchy.
 - React Navigation Drawer is the only added runtime dependency. SDK 54 requires it for Expo Router drawers, and it supplies native swipe gestures and state-preserving navigation.
 - The Account menu uses React Native's existing Modal and Animated primitives. One shared menu owns navigation, profile data, keyboard handling, and logout state; only the web popover and native bottom-sheet presentation differ.
+- Theme presets are configuration objects behind a stable semantic-token
+  contract. Components never branch on a preset ID, so new presets and future
+  tenant overrides do not require component rewrites.
 - Responsive decisions use usable content width after reserved sidebar space and page gutters. Compact-phone density is centralized instead of repeated as one-off platform checks.
 - Icon-and-label controls use one inline layout contract: non-wrapping rows, non-shrinking icon slots, shrinkable text, and single-line truncation remain consistent across native and web targets.
-- React context is used only for auth, theme, and application-shell UI state. A global store is not warranted by the current data model.
+- Auth context hydrates one validated database authorization snapshot per login
+  and exposes `hasRole`, `isAdmin`, and `can`; Supabase RLS remains authoritative.
+- React context is used only for auth, authorization, theme, and application-shell UI state. A global store is not warranted by the current data model.
 - The screen examples contain complete local interactions and representative data. Replace those module-level datasets with repository/API hooks as the backend domain is introduced; the shell and route contracts do not need to change.
 - Accessibility labels, roles, selected/busy states, 44px touch targets, keyboard focus treatments, and reduced layout complexity are built into shared primitives rather than repeated per screen.

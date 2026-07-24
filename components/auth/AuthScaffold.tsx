@@ -11,7 +11,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AppLogo } from "@/components/AppLogo";
 import { IconButton } from "@/components/ui/IconButton";
 import { Card } from "@/components/ui/Card";
-import { radii, spacing } from "@/constants/theme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -27,7 +26,8 @@ export function AuthScaffold({
   subtitle,
   title,
 }: PropsWithChildren<AuthScaffoldProps>) {
-  const { colors, resolvedTheme, toggleTheme } = useAppTheme();
+  const { colors, resolvedTheme, toggleTheme, tokens } = useAppTheme();
+  const { radii, spacing } = tokens;
   const responsive = useResponsiveLayout();
   const showBrandPanel = responsive.width >= 960;
 
@@ -56,10 +56,7 @@ export function AuthScaffold({
                   width: 360,
                   height: 360,
                   borderWidth: 80,
-                  borderColor:
-                    resolvedTheme === "dark"
-                      ? "rgba(129, 140, 248, 0.16)"
-                      : "rgba(255, 255, 255, 0.08)",
+                  borderColor: colors.heroDecoration,
                   borderRadius: 180,
                 }}
               />
@@ -79,10 +76,7 @@ export function AuthScaffold({
                 <Text
                   style={{
                     marginTop: spacing.md,
-                    color:
-                      resolvedTheme === "dark"
-                        ? "rgba(24, 24, 27, 0.65)"
-                        : "rgba(250, 250, 250, 0.68)",
+                    color: colors.heroMuted,
                     fontSize: 15,
                     lineHeight: 23,
                   }}
@@ -92,10 +86,7 @@ export function AuthScaffold({
               </View>
               <Text
                 style={{
-                  color:
-                    resolvedTheme === "dark"
-                      ? "rgba(24, 24, 27, 0.5)"
-                      : "rgba(250, 250, 250, 0.5)",
+                  color: colors.heroSubtle,
                   fontSize: 12,
                 }}
               >

@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
 
 import { Inline, inlineStyles } from "@/components/ui/Inline";
-import { radii, spacing } from "@/constants/theme";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface AppLogoProps {
@@ -11,7 +10,7 @@ interface AppLogoProps {
 }
 
 export function AppLogo({ compact = false, inverse = false }: AppLogoProps) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const markBackground = inverse ? colors.primaryForeground : colors.primary;
   const markForeground = inverse ? colors.primary : colors.primaryForeground;
   const titleColor = inverse ? colors.primaryForeground : colors.foreground;
@@ -20,7 +19,7 @@ export function AppLogo({ compact = false, inverse = false }: AppLogoProps) {
     : colors.foregroundMuted;
 
   return (
-    <Inline gap={spacing.sm}>
+    <Inline gap={tokens.spacing.sm}>
       <View
         style={[
           inlineStyles.icon,
@@ -29,7 +28,7 @@ export function AppLogo({ compact = false, inverse = false }: AppLogoProps) {
             height: 36,
             alignItems: "center",
             justifyContent: "center",
-            borderRadius: radii.md,
+            borderRadius: tokens.radii.md,
             backgroundColor: markBackground,
           },
         ]}

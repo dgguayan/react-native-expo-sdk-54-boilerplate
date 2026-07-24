@@ -3,10 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { Switch, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
+import { ThemeSettings } from "@/components/settings/ThemeSettings";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { radii, spacing, type ThemeMode } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAuth } from "@/providers/AuthProvider";
@@ -24,12 +23,6 @@ const defaultPreferences: DevicePreferences = {
   weeklySummary: true,
 };
 
-const themeOptions = [
-  { label: "System", value: "system" },
-  { label: "Light", value: "light" },
-  { label: "Dark", value: "dark" },
-] as const;
-
 function SettingsSection({
   children,
   description,
@@ -39,7 +32,7 @@ function SettingsSection({
   description: string;
   title: string;
 }) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const responsive = useResponsiveLayout();
 
   return (
@@ -49,7 +42,11 @@ function SettingsSection({
         {description}
       </Text>
       <View
-        style={{ marginTop: responsive.isMobile ? spacing.md : spacing.lg }}
+        style={{
+          marginTop: responsive.isMobile
+            ? tokens.spacing.md
+            : tokens.spacing.lg,
+        }}
       >
         {children}
       </View>
@@ -68,11 +65,20 @@ function PreferenceRow({
   onValueChange: (value: boolean) => void;
   value: boolean;
 }) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const responsive = useResponsiveLayout();
 
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: responsive.isCompact ? spacing.sm : spacing.lg }}>
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: responsive.isCompact
+          ? tokens.spacing.sm
+          : tokens.spacing.lg,
+      }}
+    >
       <View style={{ minWidth: 0, flex: 1 }}>
         <Text style={{ color: colors.foreground, fontSize: 14, fontWeight: "500" }}>{label}</Text>
         <Text style={{ marginTop: 3, color: colors.foregroundMuted, fontSize: 12, lineHeight: 17 }}>
@@ -83,7 +89,7 @@ function PreferenceRow({
         accessibilityLabel={label}
         ios_backgroundColor={colors.borderStrong}
         onValueChange={onValueChange}
-        thumbColor="#FFFFFF"
+        thumbColor={colors.controlThumb}
         trackColor={{ false: colors.borderStrong, true: colors.brand }}
         value={value}
       />
@@ -92,7 +98,7 @@ function PreferenceRow({
 }
 
 export default function SettingsScreen() {
-  const { colors, mode, setMode } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const { user } = useAuth();
   const { drawerWidth, isDesktop } = useAppShell();
   const responsive = useResponsiveLayout(isDesktop ? drawerWidth : 0);
@@ -138,15 +144,10 @@ export default function SettingsScreen() {
     >
       <View style={{ gap: responsive.sectionGap }}>
         <SettingsSection
-          title="Appearance"
-          description="Choose how Workspace looks on this device. System follows your OS preference."
+          title="Theme settings"
+          description="Select the shared application design and your personal display mode."
         >
-          <SegmentedControl<ThemeMode>
-            accessibilityLabel="Theme preference"
-            onChange={setMode}
-            options={themeOptions}
-            value={mode}
-          />
+          <ThemeSettings />
         </SettingsSection>
 
         <SettingsSection
@@ -154,7 +155,11 @@ export default function SettingsScreen() {
           description="These preferences are stored locally and apply to this device."
         >
           <View
-            style={{ gap: responsive.isMobile ? spacing.md : spacing.xl }}
+            style={{
+              gap: responsive.isMobile
+                ? tokens.spacing.md
+                : tokens.spacing.xl,
+            }}
           >
             <PreferenceRow
               label="Project updates"
@@ -162,7 +167,12 @@ export default function SettingsScreen() {
               value={preferences.projectUpdates}
               onValueChange={(value) => updatePreference("projectUpdates", value)}
             />
-            <View style={{ height: 1, backgroundColor: colors.border }} />
+            <View
+              style={{
+                height: tokens.borders.thin,
+                backgroundColor: colors.border,
+              }}
+            />
             <PreferenceRow
               label="Weekly summary"
               description="Receive a concise weekly digest of workspace activity."
@@ -181,12 +191,16 @@ export default function SettingsScreen() {
               flexDirection: responsive.isCompact ? "column" : "row",
               alignItems: responsive.isCompact ? "flex-start" : "center",
               justifyContent: "space-between",
-              gap: responsive.isCompact ? spacing.sm : spacing.md,
-              borderWidth: 1,
+              gap: responsive.isCompact
+                ? tokens.spacing.sm
+                : tokens.spacing.md,
+              borderWidth: tokens.borders.thin,
               borderColor: colors.border,
-              borderRadius: radii.md,
+              borderRadius: tokens.radii.md,
               backgroundColor: colors.surfaceMuted,
-              padding: responsive.isCompact ? spacing.sm : spacing.md,
+              padding: responsive.isCompact
+                ? tokens.spacing.sm
+                : tokens.spacing.md,
             }}
           >
             <View style={{ minWidth: 0, flex: 1 }}>

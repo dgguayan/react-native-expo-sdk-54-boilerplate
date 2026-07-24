@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { layout, spacing } from "@/constants/theme";
+import { layout } from "@/constants/theme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -25,7 +25,8 @@ export function Screen({
   description,
   title,
 }: PropsWithChildren<ScreenProps>) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
+  const { spacing } = tokens;
   const insets = useSafeAreaInsets();
   const responsive = useResponsiveLayout();
   const stackHeader = responsive.frameWidth < 520;

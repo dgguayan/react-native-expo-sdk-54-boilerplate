@@ -1,8 +1,15 @@
 import type { User } from "@supabase/supabase-js";
 
 function metadataString(user: User | null, key: string): string | undefined {
-  const value: unknown = user?.user_metadata?.[key];
-  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+  const appValue: unknown = user?.app_metadata?.[key];
+  if (typeof appValue === "string" && appValue.trim()) {
+    return appValue.trim();
+  }
+
+  const userValue: unknown = user?.user_metadata?.[key];
+  return typeof userValue === "string" && userValue.trim()
+    ? userValue.trim()
+    : undefined;
 }
 
 function titleCase(value: string): string {
@@ -30,10 +37,6 @@ export function getUserInitials(user: User | null): string {
   if (words.length === 0) return "U";
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return `${words[0].charAt(0)}${words.at(-1)?.charAt(0) ?? ""}`.toUpperCase();
-}
-
-export function getUserRole(user: User | null): string {
-  return metadataString(user, "role") ?? "Member";
 }
 
 export function getUserAvatarUrl(user: User | null): string | undefined {

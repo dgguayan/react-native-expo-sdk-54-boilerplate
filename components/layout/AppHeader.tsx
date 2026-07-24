@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { UserAvatar } from "@/components/account/UserAvatar";
 import { IconButton } from "@/components/ui/IconButton";
 import { inlineStyles } from "@/components/ui/Inline";
-import { layout, spacing } from "@/constants/theme";
+import { layout } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
@@ -15,14 +15,14 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
-  const { colors, resolvedTheme, toggleTheme } = useAppTheme();
+  const { colors, resolvedTheme, toggleTheme, tokens } = useAppTheme();
   const { desktopCollapsed, isDesktop } = useAppShell();
   const responsive = useResponsiveLayout();
 
   return (
     <SafeAreaView
       edges={["top"]}
-      style={{ backgroundColor: colors.surface }}
+      style={{ backgroundColor: colors.navbar }}
     >
       <View
         accessibilityRole="toolbar"
@@ -35,14 +35,16 @@ export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
                 ? 60
                 : layout.headerHeight,
             justifyContent: "space-between",
-            gap: responsive.isCompact ? spacing.xs : spacing.md,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.border,
+            gap: responsive.isCompact
+              ? tokens.spacing.xs
+              : tokens.spacing.md,
+            borderBottomWidth: tokens.borders.thin,
+            borderBottomColor: colors.navbarBorder,
             paddingHorizontal: isDesktop
-              ? spacing.xl
+              ? tokens.spacing.xl
               : responsive.isCompact
-                ? spacing.xs
-                : spacing.md,
+                ? tokens.spacing.xs
+                : tokens.spacing.md,
           },
         ]}
       >
@@ -50,7 +52,11 @@ export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
           style={[
             inlineStyles.row,
             inlineStyles.fill,
-            { gap: responsive.isCompact ? spacing.xs : spacing.sm },
+            {
+              gap: responsive.isCompact
+                ? tokens.spacing.xs
+                : tokens.spacing.sm,
+            },
           ]}
         >
           <IconButton
@@ -66,7 +72,7 @@ export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
           />
           {isDesktop ? (
             <>
-              <Text style={{ color: colors.foregroundMuted, fontSize: 13 }}>
+            <Text style={{ color: colors.foregroundMuted, fontSize: 13 }}>
                 Workspace
               </Text>
               <Text style={{ color: colors.foregroundSubtle, fontSize: 13 }}>
@@ -76,7 +82,11 @@ export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
           ) : null}
           <Text
             numberOfLines={1}
-            style={{ color: colors.foreground, fontSize: 14, fontWeight: "600" }}
+            style={{
+              color: colors.navbarForeground,
+              fontSize: 14,
+              fontWeight: "600",
+            }}
           >
             {title}
           </Text>
@@ -86,7 +96,11 @@ export function AppHeader({ onMenuPress, title }: AppHeaderProps) {
           style={[
             inlineStyles.row,
             inlineStyles.icon,
-            { gap: responsive.isCompact ? spacing.xxs : spacing.xs },
+            {
+              gap: responsive.isCompact
+                ? tokens.spacing.xxs
+                : tokens.spacing.xs,
+            },
           ]}
         >
           <IconButton

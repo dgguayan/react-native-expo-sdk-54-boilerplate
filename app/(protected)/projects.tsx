@@ -11,7 +11,6 @@ import { Input } from "@/components/Input";
 import { InlineIconLabel, inlineStyles } from "@/components/ui/Inline";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
@@ -35,7 +34,8 @@ const projectData = [
 ] as const;
 
 export default function ProjectsScreen() {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
+  const { radii, spacing } = tokens;
   const { drawerWidth, isDesktop } = useAppShell();
   const responsive = useResponsiveLayout(isDesktop ? drawerWidth : 0);
   const [query, setQuery] = useState("");
@@ -202,7 +202,7 @@ export default function ProjectsScreen() {
                         backgroundColor: index % 2 === 0 ? colors.primary : colors.brand,
                       }}
                     >
-                      <Text style={{ color: "#FFFFFF", fontSize: 8, fontWeight: "700" }}>{initials}</Text>
+                      <Text style={{ color: colors.onBrand, fontSize: 8, fontWeight: "700" }}>{initials}</Text>
                     </View>
                   ))}
                 </View>

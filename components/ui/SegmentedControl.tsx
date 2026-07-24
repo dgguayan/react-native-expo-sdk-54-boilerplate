@@ -7,7 +7,6 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import { radii, spacing } from "@/constants/theme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -58,7 +57,7 @@ function SegmentButton({
   selected,
   status,
 }: SegmentButtonProps) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const [focused, setFocused] = useState(false);
   const [hovered, setHovered] = useState(false);
 
@@ -79,7 +78,7 @@ function SegmentButton({
         flexShrink: grid ? 0 : undefined,
         alignItems: status ? "center" : undefined,
         justifyContent: "center",
-        borderWidth: 1,
+        borderWidth: tokens.borders.thin,
         borderColor: focused
           ? colors.focusRing
           : selected
@@ -89,7 +88,7 @@ function SegmentButton({
             : hovered && status
               ? colors.borderStrong
               : "transparent",
-        borderRadius: status ? radii.md : radii.sm,
+        borderRadius: status ? tokens.radii.md : tokens.radii.sm,
         backgroundColor: selected
           ? status
             ? colors.brandSoft
@@ -99,12 +98,12 @@ function SegmentButton({
             : "transparent",
         paddingHorizontal: status
           ? grid
-            ? spacing.sm
-            : spacing.lg
+            ? tokens.spacing.sm
+            : tokens.spacing.lg
           : compact
             ? 10
-            : spacing.md,
-        paddingVertical: status ? spacing.xs : undefined,
+            : tokens.spacing.md,
+        paddingVertical: status ? tokens.spacing.xs : undefined,
         opacity: pressed ? 0.76 : 1,
         transform: status ? [{ scale: pressed ? 0.985 : 1 }] : undefined,
         ...webInteractionStyle,
@@ -112,7 +111,6 @@ function SegmentButton({
     >
       {status ? (
         <View
-          pointerEvents="none"
           style={{
             minWidth: 0,
             flexDirection: "row",
@@ -120,6 +118,7 @@ function SegmentButton({
             alignItems: "center",
             justifyContent: "center",
             gap: 6,
+            pointerEvents: "none",
           }}
         >
           <View
@@ -127,7 +126,7 @@ function SegmentButton({
               width: 6,
               height: 6,
               flexShrink: 0,
-              borderRadius: radii.full,
+              borderRadius: tokens.radii.full,
               backgroundColor: selected ? colors.brand : "transparent",
             }}
           />
@@ -168,7 +167,7 @@ export function SegmentedControl<Value extends string>({
   value,
   variant = "default",
 }: SegmentedControlProps<Value>) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const responsive = useResponsiveLayout();
   const status = variant === "status";
   const usePhoneGrid = status && responsive.isPhone;
@@ -181,12 +180,12 @@ export function SegmentedControl<Value extends string>({
         alignSelf: usePhoneGrid || responsive.isCompact ? "stretch" : "flex-start",
         flexDirection: "row",
         flexWrap: "wrap",
-        gap: status ? spacing.xs : spacing.xxs,
-        borderWidth: status ? 1 : 0,
+        gap: status ? tokens.spacing.xs : tokens.spacing.xxs,
+        borderWidth: status ? tokens.borders.thin : 0,
         borderColor: colors.border,
-        borderRadius: status ? radii.lg : radii.md,
+        borderRadius: status ? tokens.radii.lg : tokens.radii.md,
         backgroundColor: colors.surfaceMuted,
-        padding: status ? spacing.xs : spacing.xxs,
+        padding: status ? tokens.spacing.xs : tokens.spacing.xxs,
       }}
     >
       {options.map((option) => (

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Image, Text, View } from "react-native";
 
-import { radii } from "@/constants/theme";
 import {
   getUserAvatarUrl,
   getUserInitials,
@@ -16,7 +15,7 @@ interface UserAvatarProps {
 
 export function UserAvatar({ showStatus = false, size = 40 }: UserAvatarProps) {
   const { user } = useAuth();
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const avatarUrl = getUserAvatarUrl(user);
   const [imageFailed, setImageFailed] = useState(false);
 
@@ -35,7 +34,7 @@ export function UserAvatar({ showStatus = false, size = 40 }: UserAvatarProps) {
           overflow: "hidden",
           alignItems: "center",
           justifyContent: "center",
-          borderRadius: radii.full,
+          borderRadius: tokens.radii.full,
           backgroundColor: colors.brandSoft,
         }}
       >
@@ -71,7 +70,7 @@ export function UserAvatar({ showStatus = false, size = 40 }: UserAvatarProps) {
             height: Math.max(10, Math.round(size * 0.28)),
             borderWidth: 2,
             borderColor: colors.surface,
-            borderRadius: radii.full,
+            borderRadius: tokens.radii.full,
             backgroundColor: colors.success,
           }}
         />

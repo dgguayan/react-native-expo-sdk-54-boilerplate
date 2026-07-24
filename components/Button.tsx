@@ -10,7 +10,6 @@ import {
 } from "react-native";
 
 import { InlineIconLabel, inlineStyles } from "@/components/ui/Inline";
-import { radii, spacing } from "@/constants/theme";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
@@ -34,21 +33,21 @@ export function Button({
   variant = "primary",
   ...pressableProps
 }: ButtonProps) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const [focused, setFocused] = useState(false);
   const [hovered, setHovered] = useState(false);
   const isDisabled = disabled || loading;
 
   const palette = {
     primary: {
-      background: colors.primary,
-      border: colors.primary,
-      foreground: colors.primaryForeground,
+      background: colors.buttonPrimary,
+      border: colors.buttonPrimary,
+      foreground: colors.buttonPrimaryForeground,
     },
     secondary: {
-      background: hovered ? colors.accent : colors.surface,
+      background: hovered ? colors.accent : colors.buttonSecondary,
       border: colors.borderStrong,
-      foreground: colors.foreground,
+      foreground: colors.buttonSecondaryForeground,
     },
     ghost: {
       background: hovered ? colors.accent : "transparent",
@@ -58,7 +57,7 @@ export function Button({
     danger: {
       background: colors.danger,
       border: colors.danger,
-      foreground: "#FFFFFF",
+      foreground: colors.onDanger,
     },
   }[variant];
 
@@ -78,11 +77,11 @@ export function Button({
           justifyContent: "center",
           flexDirection: "row",
           flexWrap: "nowrap",
-          gap: spacing.xs,
-          paddingHorizontal: spacing.md,
+          gap: tokens.spacing.xs,
+          paddingHorizontal: tokens.spacing.md,
           paddingVertical: 10,
-          borderRadius: radii.md,
-          borderWidth: 1,
+          borderRadius: tokens.radii.md,
+          borderWidth: tokens.borders.thin,
           borderColor: focused ? colors.focusRing : palette.border,
           backgroundColor: palette.background,
           opacity: isDisabled ? 0.55 : pressed ? 0.82 : 1,

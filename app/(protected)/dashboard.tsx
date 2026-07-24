@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { inlineStyles } from "@/components/ui/Inline";
 import { ProgressBar } from "@/components/ui/ProgressBar";
-import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAuth } from "@/providers/AuthProvider";
@@ -47,7 +46,8 @@ function firstNameFromEmail(email?: string): string {
 }
 
 export default function DashboardScreen() {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
+  const { radii, spacing } = tokens;
   const { user } = useAuth();
   const { drawerWidth, isDesktop } = useAppShell();
   const responsive = useResponsiveLayout(isDesktop ? drawerWidth : 0);

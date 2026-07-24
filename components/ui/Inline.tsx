@@ -11,7 +11,7 @@ import {
   type StyleProp,
 } from "react-native";
 
-import { spacing } from "@/constants/theme";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 export const inlineStyles = StyleSheet.create({
   content: {
@@ -45,12 +45,17 @@ interface InlineProps extends ViewProps {
 
 export function Inline({
   children,
-  gap = spacing.xs,
+  gap,
   style,
   ...viewProps
 }: PropsWithChildren<InlineProps>) {
+  const { tokens } = useAppTheme();
+
   return (
-    <View style={[inlineStyles.row, { gap }, style]} {...viewProps}>
+    <View
+      style={[inlineStyles.row, { gap: gap ?? tokens.spacing.xs }, style]}
+      {...viewProps}
+    >
       {children}
     </View>
   );
@@ -92,7 +97,7 @@ export function InlineIconLabel({
   color,
   containerStyle,
   fill = false,
-  gap = spacing.xs,
+  gap,
   icon,
   iconSize = 18,
   label,

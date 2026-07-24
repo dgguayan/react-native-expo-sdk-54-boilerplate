@@ -1,7 +1,12 @@
 import { useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 
-import { layout, spacing } from "@/constants/theme";
+import {
+  layout,
+  spacing,
+  type AppSpacing,
+} from "@/constants/theme";
+import { useOptionalAppTheme } from "@/providers/ThemeProvider";
 
 export interface ResponsiveLayoutMetrics {
   cardPadding: number;
@@ -26,6 +31,7 @@ export function getResponsiveLayoutMetrics(
   width: number,
   height: number,
   reservedWidth = 0,
+  space: AppSpacing = spacing,
 ): ResponsiveLayoutMetrics {
   const frameWidth = Math.max(0, width - reservedWidth);
   const isCompact = frameWidth < layout.compactBreakpoint;
@@ -34,44 +40,44 @@ export function getResponsiveLayoutMetrics(
   const isDesktop = frameWidth >= layout.desktopBreakpoint;
   const isTablet = !isMobile && !isDesktop;
   const pageHorizontalPadding = isCompact
-    ? spacing.sm
+    ? space.sm
     : isPhone
-      ? spacing.md
+      ? space.md
       : isMobile || isTablet
-        ? spacing.lg
-        : spacing.xl;
+        ? space.lg
+        : space.xl;
   const pageTopPadding = isCompact
-    ? spacing.sm
+    ? space.sm
     : isPhone
-      ? spacing.md
+      ? space.md
       : isMobile
-        ? spacing.lg
+        ? space.lg
         : isTablet
-          ? spacing.xl
-          : spacing["2xl"];
+          ? space.xl
+          : space["2xl"];
   const pageBottomPadding = isCompact
-    ? spacing.xl
+    ? space.xl
     : isPhone
-      ? spacing["2xl"]
+      ? space["2xl"]
       : isMobile || isTablet
-        ? spacing["3xl"]
-        : spacing["4xl"];
+        ? space["3xl"]
+        : space["4xl"];
   const cardPadding = isCompact
     ? 14
     : isPhone
-      ? spacing.md
+      ? space.md
       : isMobile || isTablet
         ? 18
         : spacing.lg;
   const sectionGap = isCompact
     ? 10
     : isPhone
-      ? spacing.sm
+      ? space.sm
       : isMobile
         ? 14
         : isTablet
-          ? spacing.md
-          : spacing.lg;
+          ? space.md
+          : space.lg;
   const boundedFrameWidth = Math.min(frameWidth, layout.contentMaxWidth);
 
   return {
@@ -98,9 +104,17 @@ export function useResponsiveLayout(
   reservedWidth = 0,
 ): ResponsiveLayoutMetrics {
   const { height, width } = useWindowDimensions();
+  const theme = useOptionalAppTheme();
+  const themeSpacing = theme?.tokens.spacing ?? spacing;
 
   return useMemo(
-    () => getResponsiveLayoutMetrics(width, height, reservedWidth),
-    [height, reservedWidth, width],
+    () =>
+      getResponsiveLayoutMetrics(
+        width,
+        height,
+        reservedWidth,
+        themeSpacing,
+      ),
+    [height, reservedWidth, themeSpacing, width],
   );
 }

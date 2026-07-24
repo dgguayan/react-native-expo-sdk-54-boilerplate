@@ -8,7 +8,6 @@ import {
 } from "react-native";
 
 import { InlineIcon, inlineStyles } from "@/components/ui/Inline";
-import { radii, spacing } from "@/constants/theme";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface InputProps extends TextInputProps {
@@ -33,7 +32,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
   },
   ref,
 ) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const [focused, setFocused] = useState(false);
   const supportingText = error ?? hint;
 
@@ -52,16 +51,16 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
           inlineStyles.row,
           {
             minHeight: 46,
-            gap: spacing.sm,
-            borderWidth: 1,
+            gap: tokens.spacing.sm,
+            borderWidth: tokens.borders.thin,
             borderColor: error
               ? colors.danger
               : focused
                 ? colors.focusRing
                 : colors.borderStrong,
-            borderRadius: radii.md,
+            borderRadius: tokens.radii.md,
             backgroundColor: colors.input,
-            paddingHorizontal: spacing.sm,
+            paddingHorizontal: tokens.spacing.sm,
           },
         ]}
       >

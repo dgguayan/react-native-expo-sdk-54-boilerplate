@@ -5,7 +5,6 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { AuthScaffold } from "@/components/auth/AuthScaffold";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
-import { radii, spacing } from "@/constants/theme";
 import { useAuth } from "@/providers/AuthProvider";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -13,7 +12,8 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
+  const { radii, spacing } = tokens;
   const passwordRef = useRef<TextInput>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,7 +51,7 @@ export default function LoginScreen() {
           </Text>
           <Link href="/(auth)/register" asChild>
             <Pressable accessibilityRole="link">
-              <Text style={{ color: colors.foreground, fontSize: 14, fontWeight: "600" }}>
+              <Text style={{ color: colors.link, fontSize: 14, fontWeight: "600" }}>
                 Create an account
               </Text>
             </Pressable>

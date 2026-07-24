@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { InlineIconLabel, inlineStyles } from "@/components/ui/Inline";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { radii, spacing } from "@/constants/theme";
 import { useAppShell } from "@/context/AppShellContext";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
@@ -29,7 +28,8 @@ const members = [
 ] as const;
 
 export default function TeamsScreen() {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
+  const { radii, spacing } = tokens;
   const { drawerWidth, isDesktop } = useAppShell();
   const responsive = useResponsiveLayout(isDesktop ? drawerWidth : 0);
   const [activeTab, setActiveTab] = useState<TeamTab>("members");

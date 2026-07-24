@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import type { ComponentProps, ReactNode } from "react";
 import { Text, View } from "react-native";
 
-import { radii, spacing } from "@/constants/theme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -21,7 +20,8 @@ export function StateView({
   title,
   tone = "neutral",
 }: StateViewProps) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
+  const { radii, spacing } = tokens;
   const responsive = useResponsiveLayout();
   const isDanger = tone === "danger";
 
@@ -30,7 +30,7 @@ export function StateView({
       accessibilityRole={isDanger ? "alert" : undefined}
       style={{
         alignItems: "center",
-        borderWidth: 1,
+        borderWidth: tokens.borders.thin,
         borderStyle: "dashed",
         borderColor: isDanger ? colors.danger : colors.borderStrong,
         borderRadius: radii.lg,

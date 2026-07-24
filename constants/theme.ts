@@ -16,6 +16,8 @@ const lightColors = {
   input: "#FFFFFF",
   primary: "#18181B",
   primaryForeground: "#FAFAFA",
+  secondary: "#E4E4E7",
+  secondaryForeground: "#27272A",
   accent: "#F4F4F5",
   accentForeground: "#27272A",
   brand: "#4F46E5",
@@ -26,9 +28,33 @@ const lightColors = {
   warningSoft: "#FFFBEB",
   danger: "#DC2626",
   dangerSoft: "#FEF2F2",
+  info: "#0369A1",
+  infoSoft: "#F0F9FF",
   focusRing: "#818CF8",
   overlay: "rgba(9, 9, 11, 0.45)",
   skeleton: "#E4E4E7",
+  sidebar: "#FFFFFF",
+  sidebarForeground: "#18181B",
+  sidebarMuted: "#71717A",
+  sidebarActive: "#EEF2FF",
+  sidebarActiveForeground: "#4F46E5",
+  sidebarBorder: "#E4E4E7",
+  navbar: "#FFFFFF",
+  navbarForeground: "#18181B",
+  navbarBorder: "#E4E4E7",
+  buttonPrimary: "#4F46E5",
+  buttonPrimaryForeground: "#FFFFFF",
+  buttonSecondary: "#FFFFFF",
+  buttonSecondaryForeground: "#18181B",
+  link: "#4F46E5",
+  onBrand: "#FFFFFF",
+  onDanger: "#FFFFFF",
+  controlThumb: "#FFFFFF",
+  heroDecoration: "rgba(255, 255, 255, 0.08)",
+  heroMuted: "rgba(250, 250, 250, 0.68)",
+  heroSubtle: "rgba(250, 250, 250, 0.5)",
+  selection: "rgba(79, 70, 229, 0.2)",
+  shadow: "#18181B",
 } as const;
 
 const darkColors: AppColors = {
@@ -44,6 +70,8 @@ const darkColors: AppColors = {
   input: "#18181B",
   primary: "#FAFAFA",
   primaryForeground: "#18181B",
+  secondary: "#3F3F46",
+  secondaryForeground: "#FAFAFA",
   accent: "#27272A",
   accentForeground: "#FAFAFA",
   brand: "#818CF8",
@@ -54,9 +82,33 @@ const darkColors: AppColors = {
   warningSoft: "#2A2110",
   danger: "#F87171",
   dangerSoft: "#321515",
+  info: "#38BDF8",
+  infoSoft: "#082F49",
   focusRing: "#A5B4FC",
   overlay: "rgba(0, 0, 0, 0.7)",
   skeleton: "#27272A",
+  sidebar: "#111113",
+  sidebarForeground: "#FAFAFA",
+  sidebarMuted: "#A1A1AA",
+  sidebarActive: "#25244A",
+  sidebarActiveForeground: "#A5B4FC",
+  sidebarBorder: "#27272A",
+  navbar: "#111113",
+  navbarForeground: "#FAFAFA",
+  navbarBorder: "#27272A",
+  buttonPrimary: "#818CF8",
+  buttonPrimaryForeground: "#18181B",
+  buttonSecondary: "#18181B",
+  buttonSecondaryForeground: "#FAFAFA",
+  link: "#A5B4FC",
+  onBrand: "#18181B",
+  onDanger: "#18181B",
+  controlThumb: "#FFFFFF",
+  heroDecoration: "rgba(129, 140, 248, 0.16)",
+  heroMuted: "rgba(24, 24, 27, 0.65)",
+  heroSubtle: "rgba(24, 24, 27, 0.5)",
+  selection: "rgba(129, 140, 248, 0.28)",
+  shadow: "#000000",
 };
 
 export type AppColors = {
@@ -80,6 +132,10 @@ export const spacing = {
   "4xl": 48,
 } as const;
 
+export type AppSpacing = {
+  [Key in keyof typeof spacing]: number;
+};
+
 export const radii = {
   sm: 8,
   md: 10,
@@ -87,6 +143,10 @@ export const radii = {
   xl: 18,
   full: 999,
 } as const;
+
+export type AppRadii = {
+  [Key in keyof typeof radii]: number;
+};
 
 export const layout = {
   compactBreakpoint: 380,
@@ -112,20 +172,66 @@ export const typography = {
   }),
 } satisfies Record<string, TextStyle["fontFamily"]>;
 
-export function surfaceShadow(theme: ResolvedTheme): ViewStyle {
+export interface AppBorderTokens {
+  strong: number;
+  thin: number;
+}
+
+export interface AppShadowTokens {
+  elevation: number;
+  offsetY: number;
+  opacityDark: number;
+  opacityLight: number;
+  radius: number;
+}
+
+export interface AppThemeTokens {
+  borders: AppBorderTokens;
+  radii: AppRadii;
+  shadows: AppShadowTokens;
+  spacing: AppSpacing;
+  typography: typeof typography;
+}
+
+export const defaultThemeTokens: AppThemeTokens = {
+  borders: {
+    thin: 1,
+    strong: 2,
+  },
+  radii,
+  shadows: {
+    elevation: 3,
+    offsetY: 4,
+    opacityDark: 0.25,
+    opacityLight: 0.07,
+    radius: 14,
+  },
+  spacing,
+  typography,
+};
+
+export function surfaceShadow(
+  theme: ResolvedTheme,
+  color = colorPalettes[theme].shadow,
+  tokens = defaultThemeTokens.shadows,
+): ViewStyle {
+  const opacity =
+    theme === "dark" ? tokens.opacityDark : tokens.opacityLight;
+
   return Platform.select<ViewStyle>({
     ios: {
-      shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: theme === "dark" ? 0.25 : 0.07,
-      shadowRadius: 14,
+      shadowColor: color,
+      shadowOffset: { width: 0, height: tokens.offsetY },
+      shadowOpacity: opacity,
+      shadowRadius: tokens.radius,
     },
-    android: { elevation: theme === "dark" ? 2 : 3 },
+    android: { elevation: Math.max(1, tokens.elevation - (theme === "dark" ? 1 : 0)) },
     web: {
-      boxShadow:
-        theme === "dark"
-          ? "0 10px 30px rgba(0, 0, 0, 0.2)"
-          : "0 10px 30px rgba(24, 24, 27, 0.06)",
+      boxShadow: `0 ${tokens.offsetY + 6}px ${tokens.radius * 2}px ${color}${Math.round(
+        opacity * 255,
+      )
+        .toString(16)
+        .padStart(2, "0")}`,
     },
     default: {},
   })!;

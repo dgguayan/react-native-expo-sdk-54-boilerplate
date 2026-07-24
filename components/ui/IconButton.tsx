@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState, type ComponentProps } from "react";
 import { Pressable, type PressableProps } from "react-native";
 
-import { radii } from "@/constants/theme";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface IconButtonProps extends Omit<PressableProps, "children"> {
@@ -19,7 +18,7 @@ export function IconButton({
   size = 20,
   ...pressableProps
 }: IconButtonProps) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
   const [focused, setFocused] = useState(false);
   const [hovered, setHovered] = useState(false);
 
@@ -40,8 +39,8 @@ export function IconButton({
         flexShrink: 0,
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: radii.md,
-        borderWidth: 1,
+        borderRadius: tokens.radii.md,
+        borderWidth: tokens.borders.thin,
         borderColor: focused ? colors.focusRing : "transparent",
         backgroundColor:
           selected || hovered || pressed ? colors.accent : "transparent",

@@ -24,9 +24,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Inline, InlineIcon, inlineStyles } from "@/components/ui/Inline";
 import { profileNavigation, settingsNavigation } from "@/constants/navigation";
-import { radii, spacing, surfaceShadow } from "@/constants/theme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
-import { getUserDisplayName, getUserRole } from "@/lib/user-profile";
+import { getRoleLabel } from "@/lib/authorization";
+import { getUserDisplayName } from "@/lib/user-profile";
 import { useAuth } from "@/providers/AuthProvider";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
@@ -90,7 +90,8 @@ function AccountMenuItem({
   nativeID,
   onPress,
 }: AccountMenuItemProps) {
-  const { colors } = useAppTheme();
+  const { colors, tokens } = useAppTheme();
+  const { radii, spacing } = tokens;
   const responsive = useResponsiveLayout();
   const [focused, setFocused] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -114,7 +115,7 @@ function AccountMenuItem({
         minHeight: responsive.isCompact ? 58 : 60,
         alignItems: "stretch",
         justifyContent: "center",
-        borderWidth: 1,
+        borderWidth: tokens.borders.thin,
         borderColor: focused ? colors.focusRing : "transparent",
         borderRadius: radii.md,
         backgroundColor:
@@ -129,7 +130,12 @@ function AccountMenuItem({
         transform: [{ scale: pressed ? 0.988 : 1 }],
       })}
     >
-      <View pointerEvents="none" style={accountMenuStyles.itemContent}>
+      <View
+        style={[
+          accountMenuStyles.itemContent,
+          { pointerEvents: "none" },
+        ]}
+      >
         <View
           style={[
             accountMenuStyles.itemFixed,
@@ -215,11 +221,12 @@ function AccountMenuContent({
   onProfile,
   onSettings,
 }: AccountMenuContentProps) {
-  const { user } = useAuth();
-  const { colors } = useAppTheme();
+  const { primaryRole, user } = useAuth();
+  const { colors, tokens } = useAppTheme();
+  const { radii, spacing } = tokens;
   const responsive = useResponsiveLayout();
   const displayName = getUserDisplayName(user);
-  const role = getUserRole(user);
+  const role = getRoleLabel(primaryRole);
 
   return (
     <ScrollView
@@ -342,7 +349,7 @@ function AccountMenuContent({
 
       <View
         style={{
-          height: 1,
+          height: tokens.borders.thin,
           marginHorizontal: spacing.sm,
           backgroundColor: colors.border,
         }}
@@ -365,7 +372,7 @@ function AccountMenuContent({
         />
         <View
           style={{
-            height: 1,
+            height: tokens.borders.thin,
             marginHorizontal: spacing.xs,
             marginVertical: 4,
             backgroundColor: colors.border,
@@ -420,14 +427,17 @@ function AccountTriggerContent({
   foregroundColor,
   mutedColor,
 }: AccountTriggerContentProps) {
+  const { tokens } = useAppTheme();
+  const { spacing } = tokens;
+
   return (
     <View
-      pointerEvents="none"
       style={[
         inlineStyles.row,
         {
           width: "100%",
           justifyContent: collapsed ? "center" : "flex-start",
+          pointerEvents: "none",
         },
       ]}
     >
@@ -496,7 +506,8 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
   const router = useRouter();
   const pathname = usePathname();
   const { signOut, user } = useAuth();
-  const { colors, resolvedTheme } = useAppTheme();
+  const { colors, shadows, tokens } = useAppTheme();
+  const { radii, spacing } = tokens;
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const responsive = useResponsiveLayout();
@@ -525,7 +536,7 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
       Animated.timing(progress, {
         duration: 140,
         toValue: 0,
-        useNativeDriver: true,
+        useNativeDriver: !isWeb,
       }).start(({ finished }) => {
         if (!finished) return;
         setMounted(false);
@@ -534,7 +545,7 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
         focusTrigger();
       });
     },
-    [focusTrigger, progress],
+    [focusTrigger, isWeb, progress],
   );
 
   const animateOpen = useCallback(() => {
@@ -546,10 +557,10 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
         bounciness: 2,
         speed: 22,
         toValue: 1,
-        useNativeDriver: true,
+        useNativeDriver: !isWeb,
       }).start();
     });
-  }, [progress]);
+  }, [isWeb, progress]);
 
   const openMenu = useCallback(() => {
     setLogoutError(null);
@@ -658,7 +669,7 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
         Math.max(spacing.sm, width - menuWidth - spacing.sm),
       ),
     };
-  }, [anchor, height, menuWidth, width]);
+  }, [anchor, height, menuWidth, spacing.sm, spacing.xs, width]);
 
   const menuContent = (
     <AccountMenuContent
@@ -701,16 +712,16 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
                   : 58,
             alignItems: "stretch",
             justifyContent: "center",
-            borderWidth: 1,
+            borderWidth: tokens.borders.thin,
             borderColor: focused
               ? colors.focusRing
               : accountRouteActive
-                ? colors.brand
+                ? colors.sidebarActiveForeground
                 : "transparent",
             borderRadius: radii.lg,
             backgroundColor:
               accountRouteActive
-                ? colors.brandSoft
+                ? colors.sidebarActive
                 : mounted
                   ? colors.accent
                   : hovered || pressed
@@ -735,25 +746,32 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
                 width: 4,
                 height: 26,
                 borderRadius: 2,
-                backgroundColor: colors.brand,
+                backgroundColor: colors.sidebarActiveForeground,
               }}
             />
           ) : null}
           <AccountTriggerContent
             avatarSize={collapsed ? 34 : responsive.isCompact ? 34 : 38}
-            chevronColor={accountRouteActive ? colors.brand : colors.foregroundSubtle}
+            chevronColor={
+              accountRouteActive
+                ? colors.sidebarActiveForeground
+                : colors.sidebarMuted
+            }
             collapsed={collapsed}
             displayName={getUserDisplayName(user)}
             email={user?.email ?? "Account"}
             expanded={mounted}
-            foregroundColor={accountRouteActive ? colors.brand : colors.foreground}
-            mutedColor={colors.foregroundMuted}
+            foregroundColor={
+              accountRouteActive
+                ? colors.sidebarActiveForeground
+                : colors.sidebarForeground
+            }
+            mutedColor={colors.sidebarMuted}
           />
         </Pressable>
 
         {collapsed && hovered && !mounted ? (
           <View
-            pointerEvents="none"
             style={{
               position: "absolute",
               left: 58,
@@ -763,6 +781,7 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
               backgroundColor: colors.primary,
               paddingHorizontal: spacing.sm,
               paddingVertical: 6,
+              pointerEvents: "none",
             }}
           >
             <Text
@@ -788,7 +807,6 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
           style={{ flex: 1, justifyContent: isWeb ? "flex-start" : "flex-end" }}
         >
           <Animated.View
-            pointerEvents="none"
             style={{
               ...StyleSheet.absoluteFillObject,
               backgroundColor: colors.overlay,
@@ -796,6 +814,7 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
                 inputRange: [0, 1],
                 outputRange: [0, isWeb ? 0.18 : 1],
               }),
+              pointerEvents: "none",
             }}
           />
           <Pressable
@@ -813,7 +832,7 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
                   width: menuWidth,
                   maxHeight: Math.max(320, height - spacing.xl),
                   overflow: "hidden",
-                  borderWidth: 1,
+                  borderWidth: tokens.borders.thin,
                   borderColor: colors.border,
                   borderRadius: radii.lg,
                   backgroundColor: colors.surfaceElevated,
@@ -834,7 +853,7 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
                   ],
                   ...popoverPosition,
                 },
-                surfaceShadow(resolvedTheme),
+                shadows.surface,
               ]}
             >
               {menuContent}
@@ -850,7 +869,7 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
                   overflow: "hidden",
                   borderTopLeftRadius: radii.xl,
                   borderTopRightRadius: radii.xl,
-                  borderWidth: 1,
+                  borderWidth: tokens.borders.thin,
                   borderBottomWidth: 0,
                   borderColor: colors.border,
                   backgroundColor: colors.surfaceElevated,
@@ -865,7 +884,7 @@ export function AccountMenu({ collapsed = false, onNavigate }: AccountMenuProps)
                     },
                   ],
                 },
-                surfaceShadow(resolvedTheme),
+                shadows.surface,
               ]}
             >
               {menuContent}
